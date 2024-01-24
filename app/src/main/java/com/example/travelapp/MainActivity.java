@@ -1,9 +1,12 @@
 package com.example.travelapp;
 
 import android.os.Bundle;
+import android.os.Handler;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.travelapp.R;
 import com.google.android.gms.maps.GoogleMap;
@@ -11,6 +14,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 
 import fragments.HomeFragment;
+import fragments.SplashFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,15 +23,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Load the initial fragment (HomeFragment in this case)
-        loadFragment(new HomeFragment());
+        // Show SplashFragment initially
+        replaceFragment(new SplashFragment());
+
+        // Delay for 2 seconds and then replace SplashFragment with HomeFragment
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                replaceFragment(new HomeFragment());
+            }
+        }, 2000);
     }
 
-    private void loadFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit();
+    private void replaceFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.fragmentContainer, fragment);
+        transaction.commit();
     }
 
 }
