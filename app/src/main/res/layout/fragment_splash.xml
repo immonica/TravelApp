@@ -22,6 +22,28 @@
             android:src="@drawable/logo"
             android:contentDescription="Your Logo Description" />
 
+        <!-- Explore mate logo ImageView below the main logo -->
+        <ImageView
+            android:id="@+id/exploreMateImageView"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_below="@id/logoImageView"
+            android:layout_marginTop="0dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/explore_mate"
+            android:contentDescription="Explore Mate Logo Description" />
+
+        <!-- Explore plan enjoy logo ImageView at the lower center of the screen -->
+        <ImageView
+            android:id="@+id/explorePlanEnjoyImageView"
+            android:layout_width="200dp"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="100dp"
+            android:src="@drawable/explore_plan_enjoy"
+            android:contentDescription="Explore Plan Enjoy Logo Description" />
+
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
