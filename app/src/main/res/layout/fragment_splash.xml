@@ -10,6 +10,18 @@
         android:layout_height="match_parent"
         android:background="@drawable/gradient_background"
         tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="-46dp" />
+        tools:layout_editor_absoluteY="-46dp">
+
+        <!-- Your logo ImageView -->
+        <ImageView
+            android:id="@+id/logoImageView"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="80dp"
+            android:src="@drawable/logo"
+            android:contentDescription="Your Logo Description" />
+
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
