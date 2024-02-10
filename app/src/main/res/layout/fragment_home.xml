@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <!-- Google Map Fragment -->
     <fragment
@@ -13,10 +14,13 @@
     <!-- Navigation Bar -->
     <LinearLayout
         android:id="@+id/navigation_bar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_gravity="bottom">
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <!-- Navigation Bar Image -->
         <ImageView
@@ -28,4 +32,27 @@
 
     </LinearLayout>
 
-</FrameLayout>
+    <!-- Search Button -->
+    <ImageView
+        android:id="@+id/search_button"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="-35dp"
+        android:src="@drawable/search_button"
+        app:layout_constraintBottom_toTopOf="@id/navigation_bar"
+        app:layout_constraintStart_toStartOf="@id/navigation_bar"
+        app:layout_constraintEnd_toEndOf="@id/navigation_bar" />
+
+    <!-- Text below Search Button -->
+    <TextView
+        android:id="@+id/search_button_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="+ New trip"
+        android:textSize="13sp"
+        android:textColor="@color/blue"
+        android:fontFamily="sans-serif-black"
+        app:layout_constraintTop_toBottomOf="@id/search_button"
+        app:layout_constraintStart_toStartOf="@id/search_button"
+        app:layout_constraintEnd_toEndOf="@id/search_button" />
+</androidx.constraintlayout.widget.ConstraintLayout>
