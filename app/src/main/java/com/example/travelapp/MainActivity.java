@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import fragments.HomeFragment;
+import fragments.PopUpFragment;
 import fragments.SplashFragment;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,7 +33,16 @@ public class MainActivity extends AppCompatActivity {
     private void replaceFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.fragmentContainer, fragment);
+        transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    // Method to handle navigation from HomeFragment to PopUpFragment
+    public void navigateToPopUpFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, new PopUpFragment())
+                .addToBackStack(null)
+                .commit();
     }
 
 }

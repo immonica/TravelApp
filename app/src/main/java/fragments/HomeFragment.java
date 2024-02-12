@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.travelapp.MainActivity;
 import com.example.travelapp.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -44,6 +45,26 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
         getLastLocation();
+
+        // Add click listener for the search button
+        view.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Call the navigateToPopUpFragment method of MainActivity to navigate to the PopUpFragment
+                ((MainActivity) requireActivity()).navigateToPopUpFragment();
+            }
+        });
+    }
+
+    private void openPopupFragment() {
+        // Create an instance of the PopupFragment
+        PopUpFragment popupFragment = new PopUpFragment();
+
+        // Begin a fragment transaction to replace the current fragment with the popup fragment
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, popupFragment) // R.id.fragment_container is the ID of the container layout in your activity
+                .addToBackStack(null) // Add the transaction to the back stack to enable navigation back to the previous fragment
+                .commit();
     }
 
     private void getLastLocation() {
