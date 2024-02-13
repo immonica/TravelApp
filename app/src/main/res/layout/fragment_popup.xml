@@ -18,4 +18,43 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"/>
+
+    <!-- Rectangle ImageView -->
+    <ImageView
+        android:id="@+id/rectangleImageView"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="60dp"
+        android:layout_marginTop="150dp"
+        android:src="@drawable/insert_text_space"
+        android:scaleType="fitXY"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- EditText for user input -->
+    <EditText
+        android:id="@+id/editText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:hint="Select a city"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="@id/rectangleImageView"
+        app:layout_constraintStart_toStartOf="@id/rectangleImageView"
+        app:layout_constraintEnd_toEndOf="@id/rectangleImageView"
+        app:layout_constraintBottom_toBottomOf="@id/rectangleImageView" />
+
+    <!-- Create Trip Button -->
+    <ImageView
+        android:id="@+id/create_trip_button"
+        android:layout_width="200dp"
+        android:layout_height="40dp"
+        android:src="@drawable/create_trip_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="50dp"
+        android:scaleType="fitXY"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
