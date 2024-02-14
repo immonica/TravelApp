@@ -24,11 +24,11 @@
         android:id="@+id/rectangleImageView"
         android:layout_width="300dp"
         android:layout_height="50dp"
-        android:layout_marginStart="60dp"
-        android:layout_marginTop="150dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:src="@drawable/insert_text_space"
         android:scaleType="fitXY"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- EditText for user input -->
@@ -36,14 +36,17 @@
         android:id="@+id/editText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
         android:hint="Select a city"
+        android:textColor="@color/blue"
+        android:textColorHint="@color/blue"
         android:background="@android:color/transparent"
         app:layout_constraintTop_toTopOf="@id/rectangleImageView"
         app:layout_constraintStart_toStartOf="@id/rectangleImageView"
         app:layout_constraintEnd_toEndOf="@id/rectangleImageView"
-        app:layout_constraintBottom_toBottomOf="@id/rectangleImageView" />
+        app:layout_constraintBottom_toBottomOf="@id/rectangleImageView"
+        android:imeOptions="actionSearch"/>
 
     <!-- Create Trip Button -->
     <ImageView

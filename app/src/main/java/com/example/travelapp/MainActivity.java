@@ -45,4 +45,15 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    public void navigateToHomeFragmentWithSearch(String searchQuery) {
+        HomeFragment homeFragment = new HomeFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("searchQuery", searchQuery);
+        homeFragment.setArguments(bundle);
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, homeFragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
 }

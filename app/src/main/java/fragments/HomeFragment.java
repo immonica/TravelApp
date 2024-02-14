@@ -33,10 +33,22 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private Location currentLocation;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
+    private String mSearchQuery;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            mSearchQuery = args.getString("searchQuery");
+            if (mSearchQuery != null && !mSearchQuery.isEmpty()) {
+                // Perform search using mSearchQuery
+                // Call a method to handle the search, e.g., geoLocate()
+            }
+        }
+
         return rootView;
     }
 
@@ -55,17 +67,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                 ((MainActivity) requireActivity()).navigateToPopUpFragment();
             }
         });
-    }
-
-    private void openPopupFragment() {
-        // Create an instance of the PopupFragment
-        PopUpFragment popupFragment = new PopUpFragment();
-
-        // Begin a fragment transaction to replace the current fragment with the popup fragment
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, popupFragment) // R.id.fragment_container is the ID of the container layout in your activity
-                .addToBackStack(null) // Add the transaction to the back stack to enable navigation back to the previous fragment
-                .commit();
     }
 
     private void getLastLocation() {
