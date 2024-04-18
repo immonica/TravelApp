@@ -18,6 +18,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.travelapp.MainActivity;
 import com.example.travelapp.R;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -25,37 +26,22 @@ import java.util.List;
 
 public class PopUpFragment extends Fragment {
 
-    private EditText mSearchText;
-
-    // TAG for logging
     private static final String TAG = "PopUpFragment";
+
+    private View rootView;
+    private static final float DEFAULT_ZOOM = 15f;
+
+    //widgets
+    private EditText mSearchText;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_popup, container, false);
+        rootView = inflater.inflate(R.layout.fragment_popup, container, false);
 
-        // Initialize EditText for search
         mSearchText = rootView.findViewById(R.id.editText);
 
-        // Set listener for search action
-        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE ||
-                        event.getAction() == KeyEvent.ACTION_DOWN || event.getAction() == KeyEvent.KEYCODE_ENTER) {
-                    // Log message to check if the method is being called
-                    Log.d(TAG, "Search action triggered");
-                    // Handle search action
-                    String query = mSearchText.getText().toString();
-                    // Call geoLocate() to search for the location
-                    geoLocate(query);
-                    return true;
-                }
-                return false;
-            }
-        });
-
+        init();
 
         // Button Click Listener
         rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
@@ -68,35 +54,53 @@ public class PopUpFragment extends Fragment {
         return rootView;
     }
 
+    private void init(){
+        Log.d(TAG, "init: initializing");
+
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
+
+                    //execute our method for searching
+                    geoLocate();
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void geoLocate(){
+        Log.d(TAG, "geoLocate: geolocating");
+
+        String searchString = mSearchText.getText().toString();
+
+        Geocoder geocoder = new Geocoder(requireContext());
+        List<Address> list = new ArrayList<>();
+        try{
+            list = geocoder.getFromLocationName(searchString, 1);
+        }catch (IOException e){
+            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
+        }
+
+        if(list.size() > 0){
+            Address address = list.get(0);
+
+            Log.d(TAG, "geoLocate: found a location: " + address.toString());
+            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+
+            ((MainActivity) requireActivity()).updateMapWithSearchResult(new LatLng(address.getLatitude(), address.getLongitude()));
+        }
+    }
+
+
     private void closePopUpFragment() {
         // Go back to the previous fragment (HomeFragment)
         requireActivity().getSupportFragmentManager().popBackStack();
     }
 
-    private void geoLocate(String searchString) {
-        Log.d(TAG, "geoLocate: geolocating with query: " + searchString);
-
-        Geocoder geocoder = new Geocoder(requireContext());
-        List<Address> list = new ArrayList<>();
-        try {
-            list = geocoder.getFromLocationName(searchString, 1);
-        } catch (IOException e) {
-            Log.e(TAG, "geoLocate: IOException: " + e.getMessage());
-        }
-
-        if (list.size() > 0) {
-            Address address = list.get(0);
-
-            Log.d(TAG, "geoLocate: found a location: " + address.toString());
-
-            // Here you can use the address details to handle the location
-            // For example, you might pass the latitude and longitude to the HomeFragment
-            double latitude = address.getLatitude();
-            double longitude = address.getLongitude();
-            String locationName = address.getAddressLine(0);
-            // Pass the location details to the HomeFragment and navigate to it
-            ((MainActivity) requireActivity()).navigateToHomeFragmentWithLocation(latitude, longitude, locationName);
-        }
-    }
 }
-

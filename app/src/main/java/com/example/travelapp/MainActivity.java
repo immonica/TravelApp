@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.maps.model.LatLng;
 
 import fragments.HomeFragment;
 import fragments.PopUpFragment;
@@ -85,34 +86,12 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    public void navigateToHomeFragmentWithSearch(String searchQuery) {
-        HomeFragment homeFragment = new HomeFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString("searchQuery", searchQuery);
-        homeFragment.setArguments(bundle);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, homeFragment)
-                .addToBackStack(null)
-                .commit();
+    public void updateMapWithSearchResult(LatLng searchResultLatLng) {
+        HomeFragment homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("HomeFragment");
+        if (homeFragment != null) {
+            homeFragment.updateMapWithSearchResult(searchResultLatLng);
+        }
     }
 
 
-    // Method to navigate to HomeFragment with location details
-    public void navigateToHomeFragmentWithLocation(double latitude, double longitude, String locationName) {
-        // Create a bundle to pass the location details to the HomeFragment
-        Bundle bundle = new Bundle();
-        bundle.putDouble("latitude", latitude);
-        bundle.putDouble("longitude", longitude);
-        bundle.putString("locationName", locationName);
-
-        // Instantiate the HomeFragment
-        HomeFragment homeFragment = new HomeFragment();
-        homeFragment.setArguments(bundle);
-
-        // Replace the current fragment with the HomeFragment
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, homeFragment)
-                .addToBackStack(null)
-                .commit();
-    }
 }
