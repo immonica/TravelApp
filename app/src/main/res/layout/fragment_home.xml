@@ -57,4 +57,38 @@
         app:layout_constraintTop_toBottomOf="@id/search_button"
         app:layout_constraintStart_toStartOf="@id/search_button"
         app:layout_constraintEnd_toEndOf="@id/search_button" />
+
+    <!-- Rectangle ImageView -->
+
+    <!-- EditText for user input -->
+
+    <ImageView
+        android:id="@+id/rectangleImageView"
+        android:layout_width="300dp"
+        android:layout_height="50dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/insert_text_space"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.144"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.023" />
+
+    <EditText
+        android:id="@+id/InputText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="10dp"
+        android:hint="Enter Address"
+        android:textColor="@color/blue"
+        android:textColorHint="@color/blue"
+        android:background="@android:color/transparent"
+        app:layout_constraintTop_toTopOf="@id/rectangleImageView"
+        app:layout_constraintStart_toStartOf="@id/rectangleImageView"
+        app:layout_constraintEnd_toEndOf="@id/rectangleImageView"
+        app:layout_constraintBottom_toBottomOf="@id/rectangleImageView"
+        android:imeOptions="actionSearch"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

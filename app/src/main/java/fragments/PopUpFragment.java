@@ -29,7 +29,6 @@ public class PopUpFragment extends Fragment {
     private static final String TAG = "PopUpFragment";
 
     private View rootView;
-    private static final float DEFAULT_ZOOM = 15f;
 
     //widgets
     private EditText mSearchText;
@@ -41,8 +40,6 @@ public class PopUpFragment extends Fragment {
 
         mSearchText = rootView.findViewById(R.id.editText);
 
-        init();
-
         // Button Click Listener
         rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,50 +50,6 @@ public class PopUpFragment extends Fragment {
 
         return rootView;
     }
-
-    private void init(){
-        Log.d(TAG, "init: initializing");
-
-        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
-
-                    //execute our method for searching
-                    geoLocate();
-                }
-
-                return false;
-            }
-        });
-    }
-
-    private void geoLocate(){
-        Log.d(TAG, "geoLocate: geolocating");
-
-        String searchString = mSearchText.getText().toString();
-
-        Geocoder geocoder = new Geocoder(requireContext());
-        List<Address> list = new ArrayList<>();
-        try{
-            list = geocoder.getFromLocationName(searchString, 1);
-        }catch (IOException e){
-            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
-        }
-
-        if(list.size() > 0){
-            Address address = list.get(0);
-
-            Log.d(TAG, "geoLocate: found a location: " + address.toString());
-            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
-
-            ((MainActivity) requireActivity()).updateMapWithSearchResult(new LatLng(address.getLatitude(), address.getLongitude()));
-        }
-    }
-
 
     private void closePopUpFragment() {
         // Go back to the previous fragment (HomeFragment)

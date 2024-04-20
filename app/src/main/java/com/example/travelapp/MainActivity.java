@@ -1,3 +1,4 @@
+
 package com.example.travelapp;
 
 import android.app.Dialog;
@@ -86,12 +87,12 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    public void updateMapWithSearchResult(LatLng searchResultLatLng) {
+    /*public void updateMapWithSearchResult(LatLng searchResultLatLng) {
         HomeFragment homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("HomeFragment");
         if (homeFragment != null) {
             homeFragment.updateMapWithSearchResult(searchResultLatLng);
         }
-    }
+    }*/
 
 
 }

@@ -1,15 +1,24 @@
+
 package fragments;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -55,15 +64,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             mMap.setMyLocationEnabled(true);
             //mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
+            init();
         }
     }
 
-    private static final String TAG = "MapActivity";
+    private static final String TAG = "HomeFragment";
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1234;
     private static final float DEFAULT_ZOOM = 15f;
+
+    //widgets
+    private EditText mSearchText;
+    private ImageView mGps;
 
     //vars
     private Boolean mLocationPermissionsGranted = false;
@@ -75,6 +89,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        mSearchText = view.findViewById(R.id.InputText);
+        //mGps = (ImageView) findViewById(R.id.ic_gps);
 
         getLocationPermission();
 
@@ -88,6 +105,61 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         });
 
         return view;
+    }
+
+    private void init(){
+        Log.d(TAG, "init: initializing");
+
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if(actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
+
+                    //execute our method for searching
+                    geoLocate();
+                }
+
+                return false;
+            }
+        });
+
+        /*mGps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "onClick: clicked gps icon");
+                getDeviceLocation();
+            }
+        });
+         */
+
+        hideSoftKeyboard();
+    }
+
+    private void geoLocate(){
+        Log.d(TAG, "geoLocate: geolocating");
+
+        String searchString = mSearchText.getText().toString();
+
+        Geocoder geocoder = new Geocoder(requireContext());
+        List<Address> list = new ArrayList<>();
+        try{
+            list = geocoder.getFromLocationName(searchString, 1);
+        }catch (IOException e){
+            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
+        }
+
+        if(list.size() > 0){
+            Address address = list.get(0);
+
+            Log.d(TAG, "geoLocate: found a location: " + address.toString());
+            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+
+            moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
+                    address.getAddressLine(0));
+        }
     }
 
     private void getDeviceLocation(){
@@ -124,6 +196,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private void moveCamera(LatLng latLng, float zoom, String title){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+
+        if(!title.equals("My Location")){
+            MarkerOptions options = new MarkerOptions()
+                    .position(latLng)
+                    .title(title);
+            mMap.addMarker(options);
+        }
+
+        hideSoftKeyboard();
     }
 
     private void initMap(){
@@ -180,10 +261,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    public void updateMapWithSearchResult(LatLng searchResultLatLng) {
+    private void hideSoftKeyboard() {
+        if (getContext() != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
+            if (getView() != null) {
+                inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(), 0);
+            }
+        }
+    }
+
+
+   /* public void updateMapWithSearchResult(LatLng searchResultLatLng) {
         // Update the map with the search result
         moveCamera(searchResultLatLng, DEFAULT_ZOOM, "Search Result");
-    }
+    }*/
 
 
 }
