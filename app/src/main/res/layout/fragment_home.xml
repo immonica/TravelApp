@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -9,7 +10,11 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Navigation Bar -->
     <LinearLayout
@@ -17,7 +22,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -58,10 +62,33 @@
         app:layout_constraintStart_toStartOf="@id/search_button"
         app:layout_constraintEnd_toEndOf="@id/search_button" />
 
+    <!-- Autocomplete CardView -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/autocomplete_cardview"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="60dp"
+        app:cardBackgroundColor="@color/grey"
+        app:cardCornerRadius="30dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <fragment
+            android:id="@+id/autocomplete_fragment"
+            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"/>
+
+    </androidx.cardview.widget.CardView>
+
     <!-- Rectangle ImageView -->
 
-    <!-- EditText for user input -->
-
+    <!-- Input Text -->
     <ImageView
         android:id="@+id/rectangleImageView"
         android:layout_width="300dp"
@@ -70,10 +97,10 @@
         android:src="@drawable/insert_text_space"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.144"
+        app:layout_constraintHorizontal_bias="0.18"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023" />
+        app:layout_constraintVertical_bias="0.098" />
 
     <EditText
         android:id="@+id/InputText"
@@ -89,6 +116,6 @@
         app:layout_constraintStart_toStartOf="@id/rectangleImageView"
         app:layout_constraintEnd_toEndOf="@id/rectangleImageView"
         app:layout_constraintBottom_toBottomOf="@id/rectangleImageView"
-        android:imeOptions="actionSearch"/>
+        android:imeOptions="actionSearch" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

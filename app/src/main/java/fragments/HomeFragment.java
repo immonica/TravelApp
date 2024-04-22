@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.travelapp.MainActivity;
 import com.example.travelapp.R;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,9 +41,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
+import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
@@ -83,6 +89,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private Boolean mLocationPermissionsGranted = false;
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private AutocompleteSupportFragment autocompleteFragment;
 
     @Nullable
     @Override
@@ -94,6 +101,52 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         //mGps = (ImageView) findViewById(R.id.ic_gps);
 
         getLocationPermission();
+
+        Places.initialize(getActivity(), getString(R.string.my_map_api_key));
+        autocompleteFragment = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment);
+        autocompleteFragment.setHint("Search for a location");
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                // Handle the selected place
+                //String add = place.getAddress();
+                //String id = place.getId();
+                LatLng latLng = place.getLatLng();
+                moveCamera(latLng, DEFAULT_ZOOM, place.getAddress());
+            }
+
+            @Override
+            public void onError(Status status) {
+                // Handle any errors
+                Toast.makeText(getContext(), "Some Error is Search", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Access the search input field of the AutocompleteSupportFragment using methods provided by the fragment
+        View autoCompleteView = autocompleteFragment.getView();
+        if (autoCompleteView != null) {
+            EditText searchInput = autoCompleteView.findViewById(com.google.android.libraries.places.R.id.places_autocomplete_search_input);
+            if (searchInput != null) {
+                searchInput.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                    @Override
+                    public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                        if (actionId == EditorInfo.IME_ACTION_SEARCH
+                                || actionId == EditorInfo.IME_ACTION_DONE
+                                || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                                || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+
+                            // Execute your method for searching
+                            geoLocate();
+
+                            return true; // Consume the event
+                        }
+
+                        return false; // Don't consume the event
+                    }
+                });
+            }
+        }
 
         // Add click listener for the search button
         view.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
@@ -107,36 +160,39 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
-    private void init(){
+    private void init() {
         Log.d(TAG, "init: initializing");
 
         mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if(actionId == EditorInfo.IME_ACTION_SEARCH
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
                         || actionId == EditorInfo.IME_ACTION_DONE
                         || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER){
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
 
-                    //execute our method for searching
+                    // Execute our method for searching
                     geoLocate();
+
+                    return true; // Consume the event
                 }
 
-                return false;
+                return false; // Don't consume the event
             }
         });
 
-        /*mGps.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "onClick: clicked gps icon");
-                getDeviceLocation();
-            }
-        });
-         */
+    /*mGps.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Log.d(TAG, "onClick: clicked gps icon");
+            getDeviceLocation();
+        }
+    });
+     */
 
         hideSoftKeyboard();
     }
+
 
     private void geoLocate(){
         Log.d(TAG, "geoLocate: geolocating");
@@ -269,12 +325,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             }
         }
     }
-
-
-   /* public void updateMapWithSearchResult(LatLng searchResultLatLng) {
-        // Update the map with the search result
-        moveCamera(searchResultLatLng, DEFAULT_ZOOM, "Search Result");
-    }*/
 
 
 }
