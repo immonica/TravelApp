@@ -3,11 +3,13 @@ package fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -16,11 +18,16 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -29,6 +36,8 @@ import androidx.fragment.app.Fragment;
 
 import com.example.travelapp.MainActivity;
 import com.example.travelapp.R;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -37,21 +46,24 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class HomeFragment extends Fragment implements OnMapReadyCallback {
+public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -82,7 +94,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private static final float DEFAULT_ZOOM = 15f;
 
     //widgets
-    private EditText mSearchText;
+    private AutoCompleteTextView mSearchText;
     private ImageView mGps;
 
     //vars
@@ -90,6 +102,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private AutocompleteSupportFragment autocompleteFragment;
+
 
     @Nullable
     @Override
@@ -155,6 +168,42 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                 // Call the navigateToPopUpFragment method of MainActivity to navigate to the PopUpFragment
                 ((MainActivity) requireActivity()).navigateToPopUpFragment();
             }
+        });
+
+        // Create an intent to launch autocomplete
+        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields) // Change FULLSCREEN to OVERLAY
+                .build(requireActivity());
+
+        // Register Activity Result Launcher
+        ActivityResultLauncher<Intent> startAutocomplete = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            Place place = Autocomplete.getPlaceFromIntent(data);
+                            Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
+                            // Handle the selected place (e.g., move the camera to the selected location)
+                            moveCamera(place.getLatLng(), DEFAULT_ZOOM, place.getName());
+                        }
+                    } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
+                        // The user canceled the operation.
+                        Log.i(TAG, "User canceled autocomplete");
+                    }
+                });
+
+        // Launch Autocomplete Intent
+        mSearchText.setOnClickListener(v -> {
+            // Hide the keyboard
+            hideSoftKeyboard();
+
+            // Delay launching the autocomplete intent to ensure the keyboard is dismissed
+            new Handler().postDelayed(() -> {
+                // Request focus for the search text view
+                mSearchText.requestFocus();
+                startAutocomplete.launch(intent);
+            }, 100); // Adjust the delay as needed
         });
 
         return view;
@@ -325,6 +374,5 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             }
         }
     }
-
 
 }

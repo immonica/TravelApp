@@ -89,33 +89,23 @@
     <!-- Rectangle ImageView -->
 
     <!-- Input Text -->
-    <ImageView
-        android:id="@+id/rectangleImageView"
-        android:layout_width="300dp"
-        android:layout_height="50dp"
-        android:scaleType="fitXY"
-        android:src="@drawable/insert_text_space"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.18"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.098" />
-
-    <EditText
+    <AutoCompleteTextView
         android:id="@+id/InputText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="10dp"
+        android:background="@drawable/insert_text_space"
         android:hint="Enter Address"
+        android:paddingStart="20dp"
+        android:imeOptions="actionSearch"
         android:textColor="@color/blue"
         android:textColorHint="@color/blue"
-        android:background="@android:color/transparent"
-        app:layout_constraintTop_toTopOf="@id/rectangleImageView"
-        app:layout_constraintStart_toStartOf="@id/rectangleImageView"
-        app:layout_constraintEnd_toEndOf="@id/rectangleImageView"
-        app:layout_constraintBottom_toBottomOf="@id/rectangleImageView"
-        android:imeOptions="actionSearch" />
+        app:layout_constraintBottom_toTopOf="@id/navigation_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.122" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
