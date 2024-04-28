@@ -3,11 +3,13 @@ package fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -47,13 +49,17 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
+import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
@@ -83,6 +89,16 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             //mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
             init();
+
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    String placeId = marker.getTag().toString(); // Get Place ID from marker tag
+                    fetchPlaceDetails(placeId); // Fetch place details
+                    return true; // Indicate event is handled
+                }
+            });
+
         }
     }
 
@@ -102,6 +118,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
     private AutocompleteSupportFragment autocompleteFragment;
+    private PlacesClient placesClient;
 
 
     @Nullable
@@ -112,6 +129,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
         mSearchText = view.findViewById(R.id.InputText);
         //mGps = (ImageView) findViewById(R.id.ic_gps);
+
+        // Disable text editing for mSearchText
+        mSearchText.setFocusable(false);
+        mSearchText.setClickable(true);
 
         getLocationPermission();
 
@@ -126,7 +147,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 //String add = place.getAddress();
                 //String id = place.getId();
                 LatLng latLng = place.getLatLng();
-                moveCamera(latLng, DEFAULT_ZOOM, place.getAddress());
+                moveCamera(latLng, DEFAULT_ZOOM, place.getAddress(), place.getId());
             }
 
             @Override
@@ -185,7 +206,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                             Place place = Autocomplete.getPlaceFromIntent(data);
                             Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
                             // Handle the selected place (e.g., move the camera to the selected location)
-                            moveCamera(place.getLatLng(), DEFAULT_ZOOM, place.getName());
+                            moveCamera(place.getLatLng(), DEFAULT_ZOOM, place.getName(), place.getId());
                         }
                     } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
                         // The user canceled the operation.
@@ -193,20 +214,59 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     }
                 });
 
+
         // Launch Autocomplete Intent
         mSearchText.setOnClickListener(v -> {
-            // Hide the keyboard
-            hideSoftKeyboard();
-
-            // Delay launching the autocomplete intent to ensure the keyboard is dismissed
-            new Handler().postDelayed(() -> {
-                // Request focus for the search text view
-                mSearchText.requestFocus();
-                startAutocomplete.launch(intent);
-            }, 100); // Adjust the delay as needed
+            // Launch Autocomplete Intent
+            startAutocomplete.launch(intent);
         });
 
+        placesClient = Places.createClient(requireContext());
+
         return view;
+    }
+
+    private void fetchPlaceDetails(String placeId) {
+        // Define fields you want to retrieve
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
+
+        // Construct a FetchPlaceRequest
+        FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
+
+        // Fetch place details asynchronously
+        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+            Place place = response.getPlace();
+            // Handle fetched place details
+            displayPlaceDetails(place);
+        }).addOnFailureListener((exception) -> {
+            // Handle fetch failure
+            Log.e(TAG, "Place not found: " + exception.getMessage());
+        });
+    }
+
+    private void displayPlaceDetails(Place place) {
+        // Get the place details
+        String name = place.getName();
+        String address = place.getAddress();
+        String phoneNumber = place.getPhoneNumber();
+        Uri websiteUri = place.getWebsiteUri();
+
+        // Construct the information string
+        StringBuilder info = new StringBuilder();
+        info.append("Name: ").append(name).append("\n");
+        info.append("Address: ").append(address).append("\n");
+        info.append("Phone: ").append(phoneNumber).append("\n");
+
+        if (websiteUri != null) {
+            info.append("Website: ").append(websiteUri.toString());
+        }
+
+        // Show the place details in a custom info window or dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Place Details")
+                .setMessage(info.toString())
+                .setPositiveButton("OK", null)
+                .show();
     }
 
     private void init() {
@@ -263,7 +323,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
 
             moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
-                    address.getAddressLine(0));
+                    address.getAddressLine(0), "somePlaceId");
         }
     }
 
@@ -285,7 +345,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
                             moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
                                     DEFAULT_ZOOM,
-                                    "My Location");
+                                    "My Location", "");
                         }else{
                             Log.d(TAG, "onComplete: current location is null");
                             Toast.makeText(getContext(), "unable to get current location", Toast.LENGTH_SHORT).show();
@@ -298,7 +358,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         }
     }
 
-    private void moveCamera(LatLng latLng, float zoom, String title){
+    private void moveCamera(LatLng latLng, float zoom, String title, String placeId){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
@@ -306,7 +366,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             MarkerOptions options = new MarkerOptions()
                     .position(latLng)
                     .title(title);
-            mMap.addMarker(options);
+            Marker marker = mMap.addMarker(options);
+            marker.setTag(placeId); // Set the tag of the marker to the place ID
         }
 
         hideSoftKeyboard();
