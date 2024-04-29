@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -56,7 +57,9 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
@@ -260,6 +263,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         String phoneNumber = place.getPhoneNumber();
         Uri websiteUri = place.getWebsiteUri();
 
+        // Fetch place photo
+        fetchPlacePhoto(place);
+
         // Construct the information string
         StringBuilder info = new StringBuilder();
         info.append("Name: ").append(name).append("\n");
@@ -276,6 +282,53 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 .setMessage(info.toString())
                 .setPositiveButton("OK", null)
                 .show();
+    }
+
+    private void fetchPlacePhoto(Place place) {
+        // Define the fields to be returned for the photo
+        List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS);
+
+        // Construct a FetchPlaceRequest
+        FetchPlaceRequest request = FetchPlaceRequest.newInstance(place.getId(), fields);
+
+        // Fetch place details asynchronously
+        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+            Place fetchedPlace = response.getPlace();
+            // Get the photo metadata
+            List<PhotoMetadata> photoMetadataList = fetchedPlace.getPhotoMetadatas();
+            if (photoMetadataList != null && !photoMetadataList.isEmpty()) {
+                // Get the first photo metadata
+                PhotoMetadata photoMetadata = photoMetadataList.get(0);
+
+                // Get the attribution text
+                String attributions = photoMetadata.getAttributions();
+
+                // Create a FetchPhotoRequest
+                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                        .setMaxHeight(1600) // Set maximum height of the photo
+                        .setMaxWidth(1600) // Set maximum width of the photo
+                        .build();
+
+                // Fetch the photo asynchronously
+                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+                    Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                    // Display the photo in your ImageView
+                    if (bitmap != null) {
+                        ImageView imageView = getView().findViewById(R.id.place_photo_image_view);
+                        if (imageView != null) {
+                            imageView.setImageBitmap(bitmap);
+                            imageView.setVisibility(View.VISIBLE); // Set visibility to VISIBLE
+                        }
+                    }
+                }).addOnFailureListener((exception) -> {
+                    // Handle photo fetch failure
+                    Log.e(TAG, "Place photo not found: " + exception.getMessage());
+                });
+            }
+        }).addOnFailureListener((exception) -> {
+            // Handle fetch failure
+            Log.e(TAG, "Place not found: " + exception.getMessage());
+        });
     }
 
     private void performTextSearch(String query) {
