@@ -4,6 +4,7 @@ package fragments;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -263,9 +264,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         String phoneNumber = place.getPhoneNumber();
         Uri websiteUri = place.getWebsiteUri();
 
-        // Fetch place photo
-        fetchPlacePhoto(place);
-
         // Construct the information string
         StringBuilder info = new StringBuilder();
         info.append("Name: ").append(name).append("\n");
@@ -276,15 +274,38 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             info.append("Website: ").append(websiteUri.toString());
         }
 
-        // Show the place details in a custom info window or dialog
+        // Inflate the custom dialog layout
+        View dialogView = getLayoutInflater().inflate(R.layout.place_details_dialog, null);
+
+        // Set the place details to the TextViews in the custom dialog layout
+        TextView placeNameTextView = dialogView.findViewById(R.id.place_name_text_view);
+        placeNameTextView.setText(name);
+
+        TextView placeAddressTextView = dialogView.findViewById(R.id.place_address_text_view);
+        placeAddressTextView.setText(address);
+
+        TextView placePhoneTextView = dialogView.findViewById(R.id.place_phone_text_view);
+        placePhoneTextView.setText(phoneNumber);
+
+        TextView placeWebsiteTextView = dialogView.findViewById(R.id.place_website_text_view);
+        if (websiteUri != null) {
+            placeWebsiteTextView.setText(websiteUri.toString());
+        } else {
+            placeWebsiteTextView.setVisibility(View.GONE);
+        }
+
+        // Fetch place photo
+        fetchPlacePhoto(place, dialogView);
+
+        // Show the custom dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("Place Details")
-                .setMessage(info.toString())
+        builder.setView(dialogView)
+                .setTitle("Place Details")
                 .setPositiveButton("OK", null)
                 .show();
     }
 
-    private void fetchPlacePhoto(Place place) {
+    private void fetchPlacePhoto(Place place, View dialogView) {
         // Define the fields to be returned for the photo
         List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS);
 
@@ -300,9 +321,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 // Get the first photo metadata
                 PhotoMetadata photoMetadata = photoMetadataList.get(0);
 
-                // Get the attribution text
-                String attributions = photoMetadata.getAttributions();
-
                 // Create a FetchPhotoRequest
                 FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
                         .setMaxHeight(1600) // Set maximum height of the photo
@@ -314,7 +332,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     Bitmap bitmap = fetchPhotoResponse.getBitmap();
                     // Display the photo in your ImageView
                     if (bitmap != null) {
-                        ImageView imageView = getView().findViewById(R.id.place_photo_image_view);
+                        // Set the fetched photo bitmap to the ImageView in the dialog layout
+                        ImageView imageView = dialogView.findViewById(R.id.place_photo_image_view);
                         if (imageView != null) {
                             imageView.setImageBitmap(bitmap);
                             imageView.setVisibility(View.VISIBLE); // Set visibility to VISIBLE
