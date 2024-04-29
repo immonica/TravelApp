@@ -55,8 +55,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.AutocompleteActivity;
@@ -130,10 +133,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         mSearchText = view.findViewById(R.id.InputText);
         //mGps = (ImageView) findViewById(R.id.ic_gps);
 
-        // Disable text editing for mSearchText
-        mSearchText.setFocusable(false);
-        mSearchText.setClickable(true);
-
         getLocationPermission();
 
         Places.initialize(getActivity(), getString(R.string.my_map_api_key));
@@ -148,6 +147,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 //String id = place.getId();
                 LatLng latLng = place.getLatLng();
                 moveCamera(latLng, DEFAULT_ZOOM, place.getAddress(), place.getId());
+
+                // Extract the name of the selected place
+                String placeName = place.getName();
+
+                // Perform a text search using the name of the selected place
+                performTextSearch(placeName);
             }
 
             @Override
@@ -191,7 +196,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         });
 
-        // Create an intent to launch autocomplete
+        /*// Disable text editing for mSearchText
+        mSearchText.setFocusable(false);
+        mSearchText.setClickable(true);*/
+
+        /*// Create an intent to launch autocomplete
         List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
         Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields) // Change FULLSCREEN to OVERLAY
                 .build(requireActivity());
@@ -219,7 +228,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         mSearchText.setOnClickListener(v -> {
             // Launch Autocomplete Intent
             startAutocomplete.launch(intent);
-        });
+        });*/
 
         placesClient = Places.createClient(requireContext());
 
@@ -268,6 +277,38 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 .setPositiveButton("OK", null)
                 .show();
     }
+
+    private void performTextSearch(String query) {
+        // Create a new PlacesClient instance
+        PlacesClient placesClient = Places.createClient(requireContext());
+
+        // Define the fields to be returned for each place
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG);
+
+        // Create a FindAutocompletePredictionsRequest
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                .setQuery(query)
+                .build();
+
+        // Perform the text search asynchronously
+        placesClient.findAutocompletePredictions(request).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                FindAutocompletePredictionsResponse response = task.getResult();
+                if (response != null) {
+                    // Process the search results
+                    List<AutocompletePrediction> predictions = response.getAutocompletePredictions();
+                    for (AutocompletePrediction prediction : predictions) {
+                        Log.i(TAG, "Place: " + prediction.getPlaceId() + ", " + prediction.getFullText(null));
+                        // Add your logic to display search results
+                    }
+                }
+            } else {
+                Log.e(TAG, "Text search failed: " + task.getException().getMessage());
+                // Handle the error
+            }
+        });
+    }
+
 
     private void init() {
         Log.d(TAG, "init: initializing");
