@@ -8,6 +8,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -15,6 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,8 +28,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -191,14 +197,27 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         }
 
+        // Find the search button
+        /*Button searchButton = view.findViewById(R.id.search_button);
+
+        // Set an OnClickListener for the search button
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Show the popup when the search button is clicked
+                showPopup();
+            }
+        });*/
+
+
         // Add click listener for the search button
-        view.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
+       /*view.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Call the navigateToPopUpFragment method of MainActivity to navigate to the PopUpFragment
                 ((MainActivity) requireActivity()).navigateToPopUpFragment();
             }
-        });
+        });*/
 
         /*// Disable text editing for mSearchText
         mSearchText.setFocusable(false);
@@ -234,10 +253,45 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             startAutocomplete.launch(intent);
         });*/
 
+        // Add click listener for the search button
+        view.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Call the openPopupDialog method
+                openPopupDialog();
+            }
+        });
+
         placesClient = Places.createClient(requireContext());
 
         return view;
     }
+
+    // Add this method to your HomeFragment class
+    private void openPopupDialog() {
+        // Inflate the popup layout
+        View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.popup_layout, null);
+
+        // Create a dialog to hold the popup view
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(requireContext());
+        dialogBuilder.setView(popupView);
+
+        // Create and show the dialog
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+
+        // Initialize the delete_button view and set its click listener
+        ImageButton deleteButton = popupView.findViewById(R.id.delete_button);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Handle delete button click
+                alertDialog.dismiss(); // Close the dialog
+            }
+        });
+    }
+
+
 
     private void fetchPlaceDetails(String placeId) {
         // Define fields you want to retrieve

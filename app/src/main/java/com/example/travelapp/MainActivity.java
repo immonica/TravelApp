@@ -87,12 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    /*public void updateMapWithSearchResult(LatLng searchResultLatLng) {
-        HomeFragment homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("HomeFragment");
-        if (homeFragment != null) {
-            homeFragment.updateMapWithSearchResult(searchResultLatLng);
-        }
-    }*/
+
 
 
 }

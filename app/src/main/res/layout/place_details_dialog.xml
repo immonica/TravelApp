@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@drawable/gradient_background_popup"
     android:padding="16dp">
 
     <!-- Image View for Photo -->
@@ -22,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Name"
+        android:textColor="@color/black"
         android:textSize="16sp"
         android:textStyle="bold" />
 
@@ -30,21 +32,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Address" />
+        android:text="Address"
+        android:textColor="@color/black"/>
 
     <TextView
         android:id="@+id/place_phone_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Phone" />
+        android:text="Phone"
+        android:textColor="@color/black"/>
 
     <TextView
         android:id="@+id/place_website_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:text="Website" />
+        android:text="Website"
+        android:textColor="@color/black"/>
 
 </LinearLayout>
 
