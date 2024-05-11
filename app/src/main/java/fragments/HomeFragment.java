@@ -278,15 +278,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setView(searchDialogView)
                 .setTitle("Search for a trip")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        // Handle OK button click
-                        // Retrieve User Input
-                        // Handle user input as needed
-                    }
-                })
-                .setNegativeButton("Cancel", null);
+                .setNegativeButton("Cancel", null); // Only Cancel button
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -313,6 +305,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             });
         }
     }
+
 
     private void fetchPlaceDetails(String placeId) {
         // Define fields you want to retrieve
