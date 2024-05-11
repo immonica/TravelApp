@@ -76,6 +76,8 @@ import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -253,6 +255,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             startAutocomplete.launch(intent);
         });*/
 
+        placesClient = Places.createClient(requireContext());
+
         // Add click listener for the search button
         view.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -262,13 +266,18 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         });
 
-        placesClient = Places.createClient(requireContext());
-
         return view;
     }
 
-    // Add this method to your HomeFragment class
+    // Declare a variable to hold the reference to the currently shown AlertDialog
+    private AlertDialog currentPopupDialog;
+
     private void openPopupDialog() {
+        // Dismiss the current dialog if it's already shown
+        if (currentPopupDialog != null && currentPopupDialog.isShowing()) {
+            currentPopupDialog.dismiss();
+        }
+
         // Inflate the popup layout
         View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.popup_layout, null);
 
@@ -277,19 +286,22 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         dialogBuilder.setView(popupView);
 
         // Create and show the dialog
-        AlertDialog alertDialog = dialogBuilder.create();
-        alertDialog.show();
+        currentPopupDialog = dialogBuilder.create();
+        currentPopupDialog.show();
 
-        // Initialize the delete_button view and set its click listener
-        ImageButton deleteButton = popupView.findViewById(R.id.delete_button);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
+        // Initialize the close button view and set its click listener
+        ImageButton closeButton = popupView.findViewById(R.id.delete_button);
+        closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle delete button click
-                alertDialog.dismiss(); // Close the dialog
+                // Handle close button click
+                currentPopupDialog.dismiss(); // Close the dialog
             }
         });
+
+        // You can add more initialization or customization here if needed
     }
+
 
 
 
