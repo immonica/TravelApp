@@ -273,6 +273,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     private void openPopupDialog() {
         // Inflate the custom dialog layout for search
         View searchDialogView = getLayoutInflater().inflate(R.layout.popup_layout, null);
+        // Find the EditText for city name
+        EditText cityEditText = searchDialogView.findViewById(R.id.cityEditText);
 
         // Set up the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -304,8 +306,45 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 }
             });
         }
+
+        // Set up the OnEditorActionListener for cityEditText
+        cityEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+
+                    // Execute method for searching city
+                    geoLocateCity(cityEditText.getText().toString());
+                    return true; // Consume the event
+                }
+                return false; // Don't consume the event
+            }
+        });
+
     }
 
+    private void geoLocateCity(String cityName) {
+        if (getContext() != null) {
+            Geocoder geocoder = new Geocoder(requireContext());
+            List<Address> list = new ArrayList<>();
+            try {
+                list = geocoder.getFromLocationName(cityName, 1);
+            } catch (IOException e) {
+                Log.e(TAG, "geoLocateCity: IOException: " + e.getMessage());
+            }
+
+            if (list.size() > 0) {
+                Address address = list.get(0);
+                moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
+                        address.getAddressLine(0), "somePlaceId");
+            } else {
+                Toast.makeText(getContext(), "Location not found", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 
     private void fetchPlaceDetails(String placeId) {
         // Define fields you want to retrieve
