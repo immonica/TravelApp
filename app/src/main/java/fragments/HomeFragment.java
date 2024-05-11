@@ -40,6 +40,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -269,41 +270,49 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         return view;
     }
 
-    // Declare a variable to hold the reference to the currently shown AlertDialog
-    private AlertDialog currentPopupDialog;
-
     private void openPopupDialog() {
-        // Dismiss the current dialog if it's already shown
-        if (currentPopupDialog != null && currentPopupDialog.isShowing()) {
-            currentPopupDialog.dismiss();
+        // Inflate the custom dialog layout for search
+        View searchDialogView = getLayoutInflater().inflate(R.layout.popup_layout, null);
+
+        // Set up the dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setView(searchDialogView)
+                .setTitle("Search for a trip")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // Handle OK button click
+                        // Retrieve User Input
+                        // Handle user input as needed
+                    }
+                })
+                .setNegativeButton("Cancel", null);
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+        // Find the AutocompleteSupportFragment within the dialog's view
+        AutocompleteSupportFragment autocompleteFragmentInDialog = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment_popup);
+
+        // Set up the AutocompleteSupportFragment using the reference from HomeFragment
+        if (autocompleteFragmentInDialog != null) {
+            autocompleteFragmentInDialog.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG));
+            autocompleteFragmentInDialog.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+                @Override
+                public void onPlaceSelected(Place place) {
+                    // Handle the selected place
+                    LatLng latLng = place.getLatLng();
+                    moveCamera(latLng, DEFAULT_ZOOM, place.getAddress(), place.getId());
+                }
+
+                @Override
+                public void onError(Status status) {
+                    // Handle any errors
+                    Toast.makeText(getContext(), "Some Error is Search", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
-
-        // Inflate the popup layout
-        View popupView = LayoutInflater.from(requireContext()).inflate(R.layout.popup_layout, null);
-
-        // Create a dialog to hold the popup view
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(requireContext());
-        dialogBuilder.setView(popupView);
-
-        // Create and show the dialog
-        currentPopupDialog = dialogBuilder.create();
-        currentPopupDialog.show();
-
-        // Initialize the close button view and set its click listener
-        ImageButton closeButton = popupView.findViewById(R.id.delete_button);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle close button click
-                currentPopupDialog.dismiss(); // Close the dialog
-            }
-        });
-
-        // You can add more initialization or customization here if needed
     }
-
-
-
 
     private void fetchPlaceDetails(String placeId) {
         // Define fields you want to retrieve
