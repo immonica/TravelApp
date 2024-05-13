@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,8 @@ public class LoginFragment extends Fragment {
     private EditText editTextEmail, editTextPassword;
     private Button buttonLogin;
     private FirebaseAuth mAuth;
+    private static final String TAG = "LoginFragment";
+
 
     @Nullable
     @Override
@@ -58,6 +61,12 @@ public class LoginFragment extends Fragment {
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
+        // Check if email or password is empty
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(getContext(), "Please enter both email and password.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -67,6 +76,7 @@ public class LoginFragment extends Fragment {
                     } else {
                         // If sign in fails, display a message to the user.
                         Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "signInWithEmail:failure", task.getException());
                     }
                 });
     }

@@ -1,4 +1,3 @@
-
 package fragments;
 
 import android.Manifest;
@@ -200,60 +199,21 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         }
 
-        // Find the search button
-        /*Button searchButton = view.findViewById(R.id.search_button);
-
-        // Set an OnClickListener for the search button
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        // Set up the OnEditorActionListener for cityEditText
+        /*cityEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
-            public void onClick(View v) {
-                // Show the popup when the search button is clicked
-                showPopup();
+            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH
+                        || actionId == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
+
+                    // Execute method for searching city
+                    geoLocateCity(cityEditText.getText().toString());
+                    return true; // Consume the event
+                }
+                return false; // Don't consume the event
             }
-        });*/
-
-
-        // Add click listener for the search button
-       /*view.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Call the navigateToPopUpFragment method of MainActivity to navigate to the PopUpFragment
-                ((MainActivity) requireActivity()).navigateToPopUpFragment();
-            }
-        });*/
-
-        /*// Disable text editing for mSearchText
-        mSearchText.setFocusable(false);
-        mSearchText.setClickable(true);*/
-
-        /*// Create an intent to launch autocomplete
-        List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
-        Intent intent = new Autocomplete.IntentBuilder(AutocompleteActivityMode.OVERLAY, fields) // Change FULLSCREEN to OVERLAY
-                .build(requireActivity());
-
-        // Register Activity Result Launcher
-        ActivityResultLauncher<Intent> startAutocomplete = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK) {
-                        Intent data = result.getData();
-                        if (data != null) {
-                            Place place = Autocomplete.getPlaceFromIntent(data);
-                            Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
-                            // Handle the selected place (e.g., move the camera to the selected location)
-                            moveCamera(place.getLatLng(), DEFAULT_ZOOM, place.getName(), place.getId());
-                        }
-                    } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
-                        // The user canceled the operation.
-                        Log.i(TAG, "User canceled autocomplete");
-                    }
-                });
-
-
-        // Launch Autocomplete Intent
-        mSearchText.setOnClickListener(v -> {
-            // Launch Autocomplete Intent
-            startAutocomplete.launch(intent);
         });*/
 
         placesClient = Places.createClient(requireContext());
@@ -285,11 +245,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
 
-        // Find the AutocompleteSupportFragment within the dialog's view
-        AutocompleteSupportFragment autocompleteFragmentInDialog = (AutocompleteSupportFragment) getChildFragmentManager().findFragmentById(R.id.autocomplete_fragment_popup);
-
         // Set up the AutocompleteSupportFragment using the reference from HomeFragment
-        if (autocompleteFragmentInDialog != null) {
+        /*if (autocompleteFragmentInDialog != null) {
             autocompleteFragmentInDialog.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG));
             autocompleteFragmentInDialog.setOnPlaceSelectedListener(new PlaceSelectionListener() {
                 @Override
@@ -305,7 +262,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     Toast.makeText(getContext(), "Some Error is Search", Toast.LENGTH_SHORT).show();
                 }
             });
-        }
+        }*/
 
         // Set up the OnEditorActionListener for cityEditText
         cityEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -547,6 +504,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         }
     }
 
+
     private void getDeviceLocation(){
         Log.d(TAG, "getDeviceLocation: getting the devices current location");
 
@@ -650,10 +608,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     private void hideSoftKeyboard() {
         if (getContext() != null) {
             InputMethodManager inputMethodManager = (InputMethodManager) getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
-            if (getView() != null) {
+            if (getView() != null && inputMethodManager != null) {
                 inputMethodManager.hideSoftInputFromWindow(getView().getWindowToken(), 0);
             }
         }
     }
-
 }

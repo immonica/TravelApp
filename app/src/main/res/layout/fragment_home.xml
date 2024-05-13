@@ -30,8 +30,8 @@
         <ImageView
             android:id="@+id/nav_bar_image"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/nav_bar"
+            android:layout_height="60dp"
+            android:background="@color/grey"
             android:scaleType="fitXY" />
 
     </LinearLayout>
@@ -61,6 +61,17 @@
         app:layout_constraintTop_toBottomOf="@id/search_button"
         app:layout_constraintStart_toStartOf="@id/search_button"
         app:layout_constraintEnd_toEndOf="@id/search_button" />
+
+    <!-- Account Icon -->
+    <ImageView
+        android:id="@+id/account_icon"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/baseline_account_circle_24"
+        app:layout_constraintTop_toTopOf="@id/navigation_bar"
+        app:layout_constraintEnd_toEndOf="@id/navigation_bar"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="5dp" />
 
     <!-- Autocomplete CardView -->
     <androidx.cardview.widget.CardView
@@ -97,8 +108,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:visibility="gone" />
-
-    <!-- Rectangle ImageView -->
 
     <!-- Input Text -->
     <AutoCompleteTextView

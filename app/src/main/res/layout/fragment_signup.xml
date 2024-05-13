@@ -52,7 +52,7 @@
         android:inputType="textEmailAddress"
         android:padding="12dp"
         android:textColorHint="@color/blue"
-        android:backgroundTint="@color/white"
+        android:backgroundTint="@color/blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textViewSignupTitle" />
@@ -77,7 +77,7 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:textColorHint="@color/blue"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/blue"
             android:padding="12dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -103,7 +103,7 @@
             android:layout_height="wrap_content"
             android:inputType="textPassword"
             android:textColorHint="@color/blue"
-            android:backgroundTint="@color/white"
+            android:backgroundTint="@color/blue"
             android:padding="12dp"/>
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -117,7 +117,7 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
         android:text="Signin"
-        android:textColor="@color/white"
+        android:textColor="@color/grey"
         android:background="@color/blue"
         android:paddingStart="24dp"
         android:paddingTop="12dp"
@@ -147,7 +147,7 @@
         android:layout_marginStart="4dp"
         android:layout_marginTop="4dp"
         android:text=" Login"
-        android:textColor="@color/white"
+        android:textColor="@color/grey"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
