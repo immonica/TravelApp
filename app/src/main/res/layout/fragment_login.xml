@@ -57,21 +57,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/textViewLoginTitle" />
 
-    <EditText
-        android:id="@+id/editTextPassword"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/textInputLayoutPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="24dp"
-        android:hint="Password"
-        android:inputType="textPassword"
-        android:padding="12dp"
-        android:textColorHint="@color/blue"
-        android:backgroundTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextEmail" />
+        app:layout_constraintTop_toBottomOf="@id/editTextEmail"
+        app:endIconMode="password_toggle"
+        android:hint="Password"
+        android:textColorHint="@color/blue">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:textColorHint="@color/blue"
+            android:backgroundTint="@color/white"
+            android:padding="12dp" />
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <Button
         android:id="@+id/buttonLogin"
@@ -89,7 +98,7 @@
         android:paddingBottom="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/editTextPassword" />
+        app:layout_constraintTop_toBottomOf="@id/textInputLayoutPassword" />
 
     <TextView
         android:id="@+id/textRegistered"

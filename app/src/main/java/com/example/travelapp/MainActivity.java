@@ -18,6 +18,8 @@ import com.google.android.gms.maps.model.LatLng;
 import fragments.HomeFragment;
 import fragments.PopUpFragment;
 import fragments.SplashFragment;
+import fragments.LoginFragment;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    replaceFragment(new HomeFragment());
+                    replaceFragment(new LoginFragment());
                 }
             }, 2000);
         } else {
@@ -78,6 +80,13 @@ public class MainActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
+    // Method to handle navigation from LoginFragment to HomeFragment
+    public void navigateToHomeFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragmentContainer, new HomeFragment())
+                .commit();
+    }
+
 
     // Method to handle navigation from HomeFragment to PopUpFragment
     public void navigateToPopUpFragment() {
