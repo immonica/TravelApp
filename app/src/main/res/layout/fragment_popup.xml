@@ -8,8 +8,8 @@
     <!-- Delete Button -->
     <ImageButton
         android:id="@+id/delete_button"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:scaleType="fitCenter"
         android:background="@drawable/ripple_effect"
         android:onClick="onDeleteButtonClick"
@@ -19,45 +19,44 @@
         android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"/>
 
-    <!-- Rectangle ImageView -->
-    <ImageView
-        android:id="@+id/rectangleImageView"
-        android:layout_width="300dp"
-        android:layout_height="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:src="@drawable/insert_text_space"
-        android:scaleType="fitXY"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- EditText for user input -->
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="0dp"
+    <!-- Title: Your Account -->
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginEnd="10dp"
-        android:hint="Select a city"
+        android:text="Your Account"
         android:textColor="@color/blue"
-        android:textColorHint="@color/blue"
-        android:background="@android:color/transparent"
-        app:layout_constraintTop_toTopOf="@id/rectangleImageView"
-        app:layout_constraintStart_toStartOf="@id/rectangleImageView"
-        app:layout_constraintEnd_toEndOf="@id/rectangleImageView"
-        app:layout_constraintBottom_toBottomOf="@id/rectangleImageView"
-        android:imeOptions="actionSearch"/>
-
-    <!-- Create Trip Button -->
-    <ImageView
-        android:id="@+id/create_trip_button"
-        android:layout_width="200dp"
-        android:layout_height="40dp"
-        android:src="@drawable/create_trip_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="50dp"
-        android:scaleType="fitXY"/>
+        app:layout_constraintTop_toBottomOf="@id/delete_button"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="20dp"/>
+
+    <!-- Text Box: Display Connected Email -->
+    <TextView
+        android:id="@+id/email_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Connected Email"
+        android:textColor="@color/blue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title_text"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="20dp"/>
+
+    <!-- Logout Button -->
+    <Button
+        android:id="@+id/logout_button"
+        android:layout_width="150dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="128dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/ripple_effect"
+        android:text="Logout"
+        android:textColor="@color/grey"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

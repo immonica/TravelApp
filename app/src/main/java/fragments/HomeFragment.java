@@ -77,6 +77,8 @@ import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 
 import java.io.IOException;
@@ -227,6 +229,22 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         });
 
+        // Find the account_icon ImageView
+        ImageView accountIcon = view.findViewById(R.id.account_icon);
+
+        // Set OnClickListener for account_icon
+        accountIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Replace current fragment with PopUpFragment
+                FragmentManager fragmentManager = getParentFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                PopUpFragment popUpFragment = new PopUpFragment();
+                fragmentTransaction.replace(R.id.fragmentContainer, popUpFragment);
+                fragmentTransaction.addToBackStack(null); // Optional: Add to back stack
+                fragmentTransaction.commit();
+            }
+        });
         return view;
     }
 
