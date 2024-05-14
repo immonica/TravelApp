@@ -12,21 +12,23 @@ import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.widget.TextView;
 
 
 import com.example.travelapp.R;
+import com.google.firebase.auth.FirebaseUser;
 
 public class PopUpFragment extends Fragment {
 
     private static final String TAG = "PopUpFragment";
 
     private View rootView;
+    private TextView emailTextView;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_popup, container, false);
-
 
         // Button Click Listener
         rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
@@ -47,6 +49,9 @@ public class PopUpFragment extends Fragment {
                 logoutUser();
             }
         });
+
+        emailTextView = rootView.findViewById(R.id.email_text);
+        setEmailText(); // Set email text when the fragment is created
 
         return rootView;
     }
@@ -81,6 +86,16 @@ public class PopUpFragment extends Fragment {
         });
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void setEmailText() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            String email = user.getEmail();
+            if (email != null) {
+                emailTextView.setText(email);
+            }
+        }
     }
 
 }
