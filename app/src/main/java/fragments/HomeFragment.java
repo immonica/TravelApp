@@ -335,6 +335,25 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                         // Optionally, you can show an error message or perform other actions here
                     }
                 });
+
+        // Extract the city name
+        String cityName = city;
+
+        // Use geocoding to get the coordinates of the city
+        Geocoder geocoder = new Geocoder(getContext());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(cityName, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                LatLng cityLatLng = new LatLng(address.getLatitude(), address.getLongitude());
+                // Move the map camera to the city coordinates
+                moveCamera(cityLatLng, DEFAULT_ZOOM, cityName, "");
+            } else {
+                Log.e(TAG, "No coordinates found for the city: " + cityName);
+            }
+        } catch (IOException e) {
+            Log.e(TAG, "Geocoding failed: " + e.getMessage());
+        }
     }
 
 
@@ -576,7 +595,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
 
-        if(!title.equals("My Location")){
+        if(!title.equals("My Location")) {
             MarkerOptions options = new MarkerOptions()
                     .position(latLng)
                     .title(title);
