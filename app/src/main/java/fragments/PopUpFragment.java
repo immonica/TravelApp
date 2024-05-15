@@ -1,22 +1,32 @@
 package fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.google.firebase.auth.FirebaseAuth;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.widget.TextView;
-
 
 import com.example.travelapp.R;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class PopUpFragment extends Fragment {
 
@@ -24,6 +34,9 @@ public class PopUpFragment extends Fragment {
 
     private View rootView;
     private TextView emailTextView;
+    // Define variables for views and Firebase
+    private DatabaseReference tripsRef;
+    private ValueEventListener valueEventListener;
 
     @Nullable
     @Override
@@ -55,6 +68,7 @@ public class PopUpFragment extends Fragment {
 
         return rootView;
     }
+
 
     private void closePopUpFragment() {
         // Go back to the previous fragment (HomeFragment)
@@ -97,5 +111,6 @@ public class PopUpFragment extends Fragment {
             }
         }
     }
+
 
 }
