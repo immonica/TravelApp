@@ -4,50 +4,35 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.example.travelapp.MainActivity;
 import com.example.travelapp.R;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -56,10 +41,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.libraries.places.api.Places;
@@ -71,20 +56,17 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsResponse;
 import com.google.android.libraries.places.api.net.PlacesClient;
-import com.google.android.libraries.places.widget.Autocomplete;
-import com.google.android.libraries.places.widget.AutocompleteActivity;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
-import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
-import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
@@ -103,9 +85,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 return;
             }
             mMap.setMyLocationEnabled(true);
-            //mMap.getUiSettings().setMyLocationButtonEnabled(false);
 
-            init();
+            //init();
 
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
@@ -128,7 +109,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
     //widgets
     private AutoCompleteTextView mSearchText;
-    private ImageView mGps;
 
     //vars
     private Boolean mLocationPermissionsGranted = false;
@@ -144,8 +124,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        mSearchText = view.findViewById(R.id.InputText);
-        //mGps = (ImageView) findViewById(R.id.ic_gps);
+        //mSearchText = view.findViewById(R.id.InputText);
 
         getLocationPermission();
 
@@ -201,22 +180,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         }
 
-        // Set up the OnEditorActionListener for cityEditText
-        /*cityEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
-
-                    // Execute method for searching city
-                    geoLocateCity(cityEditText.getText().toString());
-                    return true; // Consume the event
-                }
-                return false; // Don't consume the event
-            }
-        });*/
 
         placesClient = Places.createClient(requireContext());
 
@@ -253,71 +216,92 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         View searchDialogView = getLayoutInflater().inflate(R.layout.popup_layout, null);
         // Find the EditText for city name
         EditText cityEditText = searchDialogView.findViewById(R.id.cityEditText);
+        EditText startDateEditText = searchDialogView.findViewById(R.id.startDateEditText);
+        EditText endDateEditText = searchDialogView.findViewById(R.id.endDateEditText);
 
         // Set up the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setView(searchDialogView)
                 .setTitle("Search for a trip")
-                .setNegativeButton("Cancel", null); // Only Cancel button
+                .setNegativeButton("Cancel", null) // Only Cancel button
+                .setPositiveButton("Create Trip", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Validate input fields
+                        String city = cityEditText.getText().toString().trim();
+                        String startDate = startDateEditText.getText().toString().trim();
+                        String endDate = endDateEditText.getText().toString().trim();
+
+                        if (!city.isEmpty() && !startDate.isEmpty() && !endDate.isEmpty()) {
+                            // Save data to Firebase (replace this with your Firebase saving logic)
+                            saveTripToFirebase(city, startDate, endDate);
+
+                            // Dismiss the dialog
+                            dialog.dismiss();
+                        } else {
+                            // Display a message indicating missing fields or invalid input (optional)
+                            Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
-
-        // Set up the AutocompleteSupportFragment using the reference from HomeFragment
-        /*if (autocompleteFragmentInDialog != null) {
-            autocompleteFragmentInDialog.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG));
-            autocompleteFragmentInDialog.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-                @Override
-                public void onPlaceSelected(Place place) {
-                    // Handle the selected place
-                    LatLng latLng = place.getLatLng();
-                    moveCamera(latLng, DEFAULT_ZOOM, place.getAddress(), place.getId());
-                }
-
-                @Override
-                public void onError(Status status) {
-                    // Handle any errors
-                    Toast.makeText(getContext(), "Some Error is Search", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }*/
-
-        // Set up the OnEditorActionListener for cityEditText
-        cityEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
-
-                    // Execute method for searching city
-                    geoLocateCity(cityEditText.getText().toString());
-                    return true; // Consume the event
-                }
-                return false; // Don't consume the event
-            }
-        });
-
     }
 
-    private void geoLocateCity(String cityName) {
-        if (getContext() != null) {
-            Geocoder geocoder = new Geocoder(requireContext());
-            List<Address> list = new ArrayList<>();
-            try {
-                list = geocoder.getFromLocationName(cityName, 1);
-            } catch (IOException e) {
-                Log.e(TAG, "geoLocateCity: IOException: " + e.getMessage());
-            }
+    private void saveTripToFirebase(String city, String startDate, String endDate) {
+        // Get a reference to the root node of the database
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
 
-            if (list.size() > 0) {
-                Address address = list.get(0);
-                moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
-                        address.getAddressLine(0), "somePlaceId");
-            } else {
-                Toast.makeText(getContext(), "Location not found", Toast.LENGTH_SHORT).show();
-            }
+        // Create a new node for the trip
+        DatabaseReference tripRef = databaseRef.child("trips").push(); // Push generates a unique ID for the trip
+
+        // Create a map to hold trip data
+        Map<String, Object> tripData = new HashMap<>();
+        tripData.put("city", city);
+        tripData.put("startDate", startDate);
+        tripData.put("endDate", endDate);
+
+        // Set the data to the database
+        tripRef.setValue(tripData)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Trip data saved successfully!");
+                        // Optionally, you can show a success message or perform other actions here
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Error saving trip data: " + e.getMessage());
+                        // Optionally, you can show an error message or perform other actions here
+                    }
+                });
+    }
+
+
+    private void geoLocate(){
+        Log.d(TAG, "geoLocate: geolocating");
+
+        String searchString = mSearchText.getText().toString();
+
+        Geocoder geocoder = new Geocoder(requireContext());
+        List<Address> list = new ArrayList<>();
+        try{
+            list = geocoder.getFromLocationName(searchString, 1);
+        }catch (IOException e){
+            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
+        }
+
+        if(list.size() > 0){
+            Address address = list.get(0);
+
+            Log.d(TAG, "geoLocate: found a location: " + address.toString());
+            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
+
+            moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
+                    address.getAddressLine(0), "somePlaceId");
         }
     }
 
@@ -464,7 +448,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     }
 
 
-    private void init() {
+   /* private void init() {
         Log.d(TAG, "init: initializing");
 
         mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -483,7 +467,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
                 return false; // Don't consume the event
             }
-        });
+        });*/
 
     /*mGps.setOnClickListener(new View.OnClickListener() {
         @Override
@@ -494,33 +478,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     });
      */
 
-        hideSoftKeyboard();
-    }
+        //hideSoftKeyboard();
+   // }
 
-
-    private void geoLocate(){
-        Log.d(TAG, "geoLocate: geolocating");
-
-        String searchString = mSearchText.getText().toString();
-
-        Geocoder geocoder = new Geocoder(requireContext());
-        List<Address> list = new ArrayList<>();
-        try{
-            list = geocoder.getFromLocationName(searchString, 1);
-        }catch (IOException e){
-            Log.e(TAG, "geoLocate: IOException: " + e.getMessage() );
-        }
-
-        if(list.size() > 0){
-            Address address = list.get(0);
-
-            Log.d(TAG, "geoLocate: found a location: " + address.toString());
-            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
-
-            moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
-                    address.getAddressLine(0), "somePlaceId");
-        }
-    }
 
 
     private void getDeviceLocation(){

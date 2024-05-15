@@ -5,34 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@drawable/gradient_background_popup"
+    android:background="@color/grey"
     android:padding="16dp">
-
-    <!-- Autocomplete CardView -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/autocomplete_cardview"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="20dp"
-        app:cardBackgroundColor="@color/grey"
-        app:cardCornerRadius="30dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginBottom="10dp">
-
-        <!-- Autocomplete Fragment -->
-        <fragment
-            android:id="@+id/autocomplete_fragment_popup"
-            android:name="com.google.android.libraries.places.widget.AutocompleteSupportFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"/>
-
-    </androidx.cardview.widget.CardView>
 
     <!-- City Title -->
     <TextView
@@ -40,10 +14,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="City"
-        android:textColor="@color/black"
+        android:textColor="@color/blue"
         android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/autocomplete_cardview"
+        app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="20dp"
         android:layout_marginTop="16dp"/>
 
@@ -54,6 +29,7 @@
         android:layout_height="wrap_content"
         android:hint="Enter city name"
         android:inputType="text"
+        android:textColor="@color/blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cityTitle"
@@ -67,7 +43,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start Date"
-        android:textColor="@color/black"
+        android:textColor="@color/blue"
+        android:textStyle="bold"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cityEditText"
@@ -81,6 +58,7 @@
         android:layout_height="wrap_content"
         android:hint="DD/MM/YYYY"
         android:inputType="date"
+        android:textColor="@color/blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/startDateTitle"
@@ -94,8 +72,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="End Date"
-        android:textColor="@color/black"
+        android:textColor="@color/blue"
         android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/startDateEditText"
         android:layout_marginStart="20dp"
@@ -108,26 +87,12 @@
         android:layout_height="wrap_content"
         android:hint="DD/MM/YYYY"
         android:inputType="date"
+        android:textColor="@color/blue"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/endDateTitle"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="20dp"
         android:layout_marginStart="20dp"/>
-
-    <!-- Create Trip Button -->
-    <ImageView
-        android:id="@+id/create_trip_button"
-        android:layout_width="200dp"
-        android:layout_height="40dp"
-        android:src="@drawable/create_trip_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:layout_marginBottom="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/endDateEditText"
-        android:layout_marginTop="30dp"
-        android:scaleType="fitXY"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

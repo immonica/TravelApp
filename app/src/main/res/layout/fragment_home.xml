@@ -110,6 +110,7 @@
         android:visibility="gone" />
 
     <!-- Input Text -->
+    <!--
     <AutoCompleteTextView
         android:id="@+id/InputText"
         android:layout_width="0dp"
@@ -128,5 +129,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.122" />
+        -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>
