@@ -3,6 +3,7 @@ package fragments;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AutoCompleteTextView;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -58,12 +60,14 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -208,6 +212,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 fragmentTransaction.commit();
             }
         });
+
         return view;
     }
 
@@ -229,32 +234,84 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     public void onClick(DialogInterface dialog, int which) {
                         // Validate input fields
                         String city = cityEditText.getText().toString().trim();
-                        String startDate = startDateEditText.getText().toString().trim();
-                        String endDate = endDateEditText.getText().toString().trim();
+                        String startDateString = startDateEditText.getText().toString().trim();
+                        String endDateString = endDateEditText.getText().toString().trim();
 
-                        if (!city.isEmpty() && !startDate.isEmpty() && !endDate.isEmpty()) {
+                        if (!city.isEmpty() && !startDateString.isEmpty() && !endDateString.isEmpty()) {
                             // Save data to Firebase (replace this with your Firebase saving logic)
-                            saveTripToFirebase(city, startDate, endDate);
-
+                            saveTripToFirebase(city, startDateString, endDateString);
                             // Dismiss the dialog
                             dialog.dismiss();
                         } else {
-                            // Display a message indicating missing fields or invalid input (optional)
+                            // Display a message indicating missing fields
                             Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
 
+        // Set up click listeners for date EditText fields
+        startDateEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(startDateEditText, endDateEditText);
+            }
+        });
+
+        endDateEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(endDateEditText, startDateEditText);
+            }
+        });
+
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
 
+    private void showDatePickerDialog(final EditText dateEditText, final EditText startDateEditText) {
+        // Get current date
+        final Calendar c = Calendar.getInstance();
+        int year = c.get(Calendar.YEAR);
+        int month = c.get(Calendar.MONTH);
+        int day = c.get(Calendar.DAY_OF_MONTH);
+
+        // Create a new DatePickerDialog instance with minimum date set to the day after the start date
+        DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
+                new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        // Display the selected date in the EditText
+                        String selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
+                        dateEditText.setText(selectedDate);
+                    }
+                }, year, month, day);
+
+        // Set the minimum date to the day after the start date
+        if (startDateEditText.getText().toString().isEmpty()) {
+            // If start date is not set, set minimum date to today
+            datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
+        } else {
+            // If start date is set, set minimum date to the day after the start date
+            String[] startDateParts = startDateEditText.getText().toString().split("/");
+            Calendar startDateCalendar = Calendar.getInstance();
+            startDateCalendar.set(Integer.parseInt(startDateParts[2]), Integer.parseInt(startDateParts[1]) - 1, Integer.parseInt(startDateParts[0]));
+            datePickerDialog.getDatePicker().setMinDate(startDateCalendar.getTimeInMillis() + (24 * 60 * 60 * 1000));
+        }
+
+        // Show the DatePickerDialog
+        datePickerDialog.show();
+    }
+
+
     private void saveTripToFirebase(String city, String startDate, String endDate) {
+        // Get the current user's UID
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
         // Get a reference to the root node of the database
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
 
-        // Create a new node for the trip
-        DatabaseReference tripRef = databaseRef.child("trips").push(); // Push generates a unique ID for the trip
+        // Create a new node for the trip under the user's UID
+        DatabaseReference tripRef = databaseRef.child("users").child(uid).child("trips").push(); // Push generates a unique ID for the trip
 
         // Create a map to hold trip data
         Map<String, Object> tripData = new HashMap<>();
@@ -279,6 +336,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     }
                 });
     }
+
 
 
     private void geoLocate(){
