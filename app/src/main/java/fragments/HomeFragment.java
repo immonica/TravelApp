@@ -327,6 +327,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "Trip data saved successfully!");
                         // Optionally, you can show a success message or perform other actions here
+                        // Navigate to MapFragment
+                        Fragment mapFragment = new MapFragment();
+                        getParentFragmentManager().beginTransaction()
+                                .replace(R.id.fragmentContainer, mapFragment)
+                                .addToBackStack(null)
+                                .commit();
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -336,25 +342,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                         // Optionally, you can show an error message or perform other actions here
                     }
                 });
-
-        // Extract the city name
-        String cityName = city;
-
-        // Use geocoding to get the coordinates of the city
-        Geocoder geocoder = new Geocoder(getContext());
-        try {
-            List<Address> addresses = geocoder.getFromLocationName(cityName, 1);
-            if (addresses != null && !addresses.isEmpty()) {
-                Address address = addresses.get(0);
-                LatLng cityLatLng = new LatLng(address.getLatitude(), address.getLongitude());
-                // Move the map camera to the city coordinates
-                moveCamera(cityLatLng, DEFAULT_ZOOM, cityName, "");
-            } else {
-                Log.e(TAG, "No coordinates found for the city: " + cityName);
-            }
-        } catch (IOException e) {
-            Log.e(TAG, "Geocoding failed: " + e.getMessage());
-        }
     }
 
     private void geoLocate(){
