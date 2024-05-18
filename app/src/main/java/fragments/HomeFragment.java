@@ -63,13 +63,18 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import java.text.SimpleDateFormat;
+
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback{
@@ -320,29 +325,56 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         tripData.put("startDate", startDate);
         tripData.put("endDate", endDate);
 
-        // Set the data to the database
-        tripRef.setValue(tripData)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "Trip data saved successfully!");
-                        // Optionally, you can show a success message or perform other actions here
-                        // Navigate to MapFragment
-                        Fragment mapFragment = new MapFragment();
-                        getParentFragmentManager().beginTransaction()
-                                .replace(R.id.fragmentContainer, mapFragment)
-                                .addToBackStack(null)
-                                .commit();
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.e(TAG, "Error saving trip data: " + e.getMessage());
-                        // Optionally, you can show an error message or perform other actions here
-                    }
-                });
+        // Calculate days between start and end dates
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        try {
+            Date startDateObj = sdf.parse(startDate);
+            Date endDateObj = sdf.parse(endDate);
+
+            Calendar startCalendar = Calendar.getInstance();
+            startCalendar.setTime(startDateObj);
+
+            Calendar endCalendar = Calendar.getInstance();
+            endCalendar.setTime(endDateObj);
+
+            List<String> daysList = new ArrayList<>();
+
+            while (!startCalendar.after(endCalendar)) {
+                String day = sdf.format(startCalendar.getTime());
+                daysList.add(day);
+                startCalendar.add(Calendar.DATE, 1);
+            }
+
+            // Add days to trip data
+            tripData.put("days", daysList);
+
+            // Set the data to the database
+            tripRef.setValue(tripData)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "Trip data saved successfully!");
+                            // Optionally, you can show a success message or perform other actions here
+                            // Navigate to MapFragment
+                            Fragment mapFragment = new MapFragment();
+                            getParentFragmentManager().beginTransaction()
+                                    .replace(R.id.fragmentContainer, mapFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG, "Error saving trip data: " + e.getMessage());
+                            // Optionally, you can show an error message or perform other actions here
+                        }
+                    });
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
+
 
     private void geoLocate(){
         Log.d(TAG, "geoLocate: geolocating");
