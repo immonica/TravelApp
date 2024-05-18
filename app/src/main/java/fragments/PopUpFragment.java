@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.travelapp.R;
@@ -37,6 +38,7 @@ public class PopUpFragment extends Fragment {
     // Define variables for views and Firebase
     private DatabaseReference tripsRef;
     private ValueEventListener valueEventListener;
+    private LinearLayout tripContainer;
 
     @Nullable
     @Override
@@ -66,9 +68,75 @@ public class PopUpFragment extends Fragment {
         emailTextView = rootView.findViewById(R.id.email_text);
         setEmailText(); // Set email text when the fragment is created
 
+        // Initialize tripContainer
+        tripContainer = rootView.findViewById(R.id.trip_container);
+
+        // Initialize Firebase reference
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            tripsRef = FirebaseDatabase.getInstance().getReference()
+                    .child("users")
+                    .child(user.getUid())
+                    .child("trips");
+        }
+
+        // Set up ValueEventListener to fetch trips data
+        if (tripsRef != null) {
+            valueEventListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    // Clear existing trip views
+                    tripContainer.removeAllViews();
+
+                    // Get total number of trips
+                    long totalTrips = dataSnapshot.getChildrenCount();
+
+                    // Limit the number of trips to display to 5 or less
+                    long start = Math.max(0, totalTrips - 5);
+                    long end = totalTrips;
+                    long index = 0;
+                    for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
+                        if (index >= start && index < end) {
+                            // Create trip view for each trip data
+                            Trip trip = tripSnapshot.getValue(Trip.class);
+                            if (trip != null) {
+                                addTripView(trip);
+                            }
+                        }
+                        index++;
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e(TAG, "Error fetching trips: " + databaseError.getMessage());
+                }
+            };
+
+            // Add ValueEventListener to tripsRef
+            tripsRef.addValueEventListener(valueEventListener);
+        }
+
+
+
         return rootView;
     }
 
+    private void addTripView(Trip trip) {
+        // Create a TextView to display trip information
+        TextView tripTextView = new TextView(requireContext());
+        tripTextView.setText(trip.getCity() + ": " + trip.getStartDate() + " - " + trip.getEndDate());
+        tripTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue));
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        layoutParams.setMargins(0, 10, 0, 0);
+        tripTextView.setLayoutParams(layoutParams);
+
+        // Add the TextView to tripContainer
+        tripContainer.addView(tripTextView);
+    }
 
     private void closePopUpFragment() {
         // Go back to the previous fragment (HomeFragment)

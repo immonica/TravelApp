@@ -356,8 +356,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         }
     }
 
-
-
     private void geoLocate(){
         Log.d(TAG, "geoLocate: geolocating");
 
