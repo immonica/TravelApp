@@ -2,12 +2,14 @@ package fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -17,6 +19,13 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.travelapp.R;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -26,6 +35,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,6 +49,7 @@ public class PopUpFragment extends Fragment {
     private DatabaseReference tripsRef;
     private ValueEventListener valueEventListener;
     private LinearLayout tripContainer;
+    private PlacesClient placesClient;
 
     @Nullable
     @Override
@@ -79,6 +90,10 @@ public class PopUpFragment extends Fragment {
                     .child(user.getUid())
                     .child("trips");
         }
+
+        Places.initialize(requireContext(), getString(R.string.my_map_api_key));
+        placesClient = Places.createClient(requireContext());
+
 
         return rootView;
     }
@@ -131,21 +146,75 @@ public class PopUpFragment extends Fragment {
         }
     }
 
-    private void addTripView(Trip trip) {
-        // Create a TextView to display trip information
-        TextView tripTextView = new TextView(requireContext());
-        tripTextView.setText(trip.getCity() + ": " + trip.getStartDate() + " - " + trip.getEndDate());
-        tripTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue));
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
-        );
-        layoutParams.setMargins(0, 10, 0, 0);
-        tripTextView.setLayoutParams(layoutParams);
 
-        // Add the TextView to tripContainer
-        tripContainer.addView(tripTextView);
+    private void addTripView(Trip trip) {
+        // Inflate the trip_item layout
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View tripView = inflater.inflate(R.layout.trip_layout, tripContainer, false);
+
+        // Get the TextView and ImageView from the inflated layout
+        TextView tripTextView = tripView.findViewById(R.id.trip_text_view);
+        ImageView tripImageView = tripView.findViewById(R.id.place_photo_image_view);
+
+        // Set the trip information in the TextView
+        tripTextView.setText(trip.getCity() + ": " + trip.getStartDate() + " - " + trip.getEndDate());
+
+        // Fetch and display the place photo in the ImageView
+        fetchPlacePhoto(trip.getCity(), tripImageView);
+
+        // Add the inflated layout to tripContainer
+        tripContainer.addView(tripView);
     }
+
+
+    private void fetchPlacePhoto(String cityName, ImageView imageView) {
+        // Create a FindAutocompletePredictionsRequest for the city name
+        FindAutocompletePredictionsRequest predictionsRequest = FindAutocompletePredictionsRequest.builder()
+                .setQuery(cityName)
+                .build();
+
+        placesClient.findAutocompletePredictions(predictionsRequest)
+                .addOnSuccessListener((response) -> {
+                    if (!response.getAutocompletePredictions().isEmpty()) {
+                        String placeId = response.getAutocompletePredictions().get(0).getPlaceId();
+                        fetchPhotoByPlaceId(placeId, imageView);
+                    }
+                })
+                .addOnFailureListener((exception) -> {
+                    Log.e(TAG, "City not found: " + exception.getMessage());
+                });
+    }
+
+    private void fetchPhotoByPlaceId(String placeId, ImageView imageView) {
+        // Define the fields to be returned for the photo
+        List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS);
+
+        FetchPlaceRequest placeRequest = FetchPlaceRequest.newInstance(placeId, fields);
+
+        placesClient.fetchPlace(placeRequest).addOnSuccessListener((response) -> {
+            Place place = response.getPlace();
+            List<PhotoMetadata> photoMetadataList = place.getPhotoMetadatas();
+            if (photoMetadataList != null && !photoMetadataList.isEmpty()) {
+                PhotoMetadata photoMetadata = photoMetadataList.get(0);
+                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                        .setMaxHeight(1600)
+                        .setMaxWidth(1600)
+                        .build();
+
+                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+                    Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                    if (bitmap != null) {
+                        imageView.setImageBitmap(bitmap);
+                    }
+                }).addOnFailureListener((exception) -> {
+                    Log.e(TAG, "Place photo not found: " + exception.getMessage());
+                });
+            }
+        }).addOnFailureListener((exception) -> {
+            Log.e(TAG, "Place not found: " + exception.getMessage());
+        });
+    }
+
 
     private void closePopUpFragment() {
         // Go back to the previous fragment (HomeFragment)
