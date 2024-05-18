@@ -80,24 +80,38 @@ public class PopUpFragment extends Fragment {
                     .child("trips");
         }
 
-        // Set up ValueEventListener to fetch trips data
+        return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        fetchTripsData();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (tripsRef != null && valueEventListener != null) {
+            tripsRef.removeEventListener(valueEventListener);
+        }
+    }
+
+    private void fetchTripsData() {
         if (tripsRef != null) {
+            if (valueEventListener != null) {
+                tripsRef.removeEventListener(valueEventListener);
+            }
+
             valueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    // Clear existing trip views
                     tripContainer.removeAllViews();
-
-                    // Get total number of trips
                     long totalTrips = dataSnapshot.getChildrenCount();
-
-                    // Limit the number of trips to display to 5 or less
                     long start = Math.max(0, totalTrips - 5);
-                    long end = totalTrips;
                     long index = 0;
                     for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                        if (index >= start && index < end) {
-                            // Create trip view for each trip data
+                        if (index >= start) {
                             Trip trip = tripSnapshot.getValue(Trip.class);
                             if (trip != null) {
                                 addTripView(trip);
@@ -113,13 +127,8 @@ public class PopUpFragment extends Fragment {
                 }
             };
 
-            // Add ValueEventListener to tripsRef
             tripsRef.addValueEventListener(valueEventListener);
         }
-
-
-
-        return rootView;
     }
 
     private void addTripView(Trip trip) {

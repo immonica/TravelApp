@@ -76,31 +76,32 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        if (mMap == null) {
+            mMap = googleMap;
+            initializeMap();
+        }
+    }
+
+    private void initializeMap() {
         Toast.makeText(getContext(), "Map is Ready", Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "onMapReady: map is ready");
-        mMap = googleMap;
+        Log.d(TAG, "initializeMap: map is ready");
 
         if (mLocationPermissionsGranted) {
             getDeviceLocation();
-
             if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                     != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
                     Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             mMap.setMyLocationEnabled(true);
-
-            //init();
-
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    String placeId = marker.getTag().toString(); // Get Place ID from marker tag
-                    fetchPlaceDetails(placeId); // Fetch place details
-                    return true; // Indicate event is handled
+                    String placeId = marker.getTag().toString();
+                    fetchPlaceDetails(placeId);
+                    return true;
                 }
             });
-
         }
     }
 
