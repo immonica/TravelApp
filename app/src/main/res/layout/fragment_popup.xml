@@ -68,7 +68,7 @@
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/email_text"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:layout_marginStart="20dp"/>
 
     <!-- HorizontalScrollView -->
@@ -82,6 +82,164 @@
 
         <LinearLayout
             android:id="@+id/trip_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="2in"
+                android:layout_height="1in"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/grey"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="5dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:scaleType="fitXY" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="#65FFFCFC"
+                    android:gravity="center|bottom"
+                    android:text="This Is Horizontal ScrollView"
+                    android:textColor="@color/blue"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="2in"
+                android:layout_height="1in"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/grey"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="5dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:scaleType="fitXY"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="#65FFFCFC"
+                    android:gravity="center|bottom"
+                    android:text="This Is Horizontal ScrollView"
+                    android:textColor="@color/blue"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="2in"
+                android:layout_height="1in"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/grey"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="5dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:scaleType="fitXY"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="#65FFFCFC"
+                    android:gravity="center|bottom"
+                    android:text="This Is Horizontal ScrollView"
+                    android:textColor="@color/blue"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="2in"
+                android:layout_height="1in"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/grey"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="5dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:scaleType="fitXY"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="#65FFFCFC"
+                    android:gravity="center|bottom"
+                    android:text="This Is Horizontal ScrollView"
+                    android:textColor="@color/blue"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="2in"
+                android:layout_height="1in"
+                android:layout_margin="5dp"
+                app:cardBackgroundColor="@color/grey"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="5dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:scaleType="fitXY"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:background="#65FFFCFC"
+                    android:gravity="center|bottom"
+                    android:text="This Is Horizontal ScrollView"
+                    android:textColor="@color/blue"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Title: Your Favorite Locations -->
+    <TextView
+        android:id="@+id/favorite_locations_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your Favorite Locations"
+        android:textColor="@color/blue"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/horizontalScrollView2"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="20dp"/>
+
+    <!-- HorizontalScrollView Favorites-->
+    <HorizontalScrollView
+        android:id="@+id/horizontalScrollView2_favorites"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/favorite_locations_title"
+        android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:id="@+id/favorites_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">

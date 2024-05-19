@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="2in"
+    android:layout_height="1in"
+    android:layout_margin="5dp"
+    app:cardBackgroundColor="@color/grey"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="5dp">
+
+    <ImageView
+        android:id="@+id/place_favorite_image_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white"
+        android:scaleType="fitXY"/>
+
+    <TextView
+        android:id="@+id/favorite_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/grey"
+        android:gravity="center|bottom"
+        android:text="This Is Horizontal ScrollView"
+        android:textColor="@color/blue"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+</androidx.cardview.widget.CardView>

@@ -47,8 +47,11 @@ public class PopUpFragment extends Fragment {
     private TextView emailTextView;
     // Define variables for views and Firebase
     private DatabaseReference tripsRef;
+    private DatabaseReference favoritesRef;
     private ValueEventListener valueEventListener;
+    private ValueEventListener favoritesValueEventListener;
     private LinearLayout tripContainer;
+    private LinearLayout favoriteContainer;
     private PlacesClient placesClient;
 
     @Nullable
@@ -81,14 +84,14 @@ public class PopUpFragment extends Fragment {
 
         // Initialize tripContainer
         tripContainer = rootView.findViewById(R.id.trip_container);
+        favoriteContainer = rootView.findViewById(R.id.favorites_container);
 
         // Initialize Firebase reference
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
-            tripsRef = FirebaseDatabase.getInstance().getReference()
-                    .child("users")
-                    .child(user.getUid())
-                    .child("trips");
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
+            tripsRef = userRef.child("trips");
+            favoritesRef = userRef.child("favorites");
         }
 
         Places.initialize(requireContext(), getString(R.string.my_map_api_key));
@@ -102,6 +105,7 @@ public class PopUpFragment extends Fragment {
     public void onResume() {
         super.onResume();
         fetchTripsData();
+        fetchFavoritesData();
     }
 
     @Override
@@ -109,6 +113,9 @@ public class PopUpFragment extends Fragment {
         super.onPause();
         if (tripsRef != null && valueEventListener != null) {
             tripsRef.removeEventListener(valueEventListener);
+        }
+        if (favoritesRef != null && favoritesValueEventListener != null) {
+            favoritesRef.removeEventListener(favoritesValueEventListener);
         }
     }
 
@@ -215,6 +222,44 @@ public class PopUpFragment extends Fragment {
         });
     }
 
+    private void fetchFavoritesData() {
+        if (favoritesRef != null) {
+            if (favoritesValueEventListener != null) {
+                favoritesRef.removeEventListener(favoritesValueEventListener);
+            }
+
+            favoritesValueEventListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    favoriteContainer.removeAllViews(); // Clear previous views
+                    for (DataSnapshot favoriteSnapshot : dataSnapshot.getChildren()) {
+                        Favorite favorite = favoriteSnapshot.getValue(Favorite.class);
+                        if (favorite != null) {
+                            addFavoriteView(favorite);
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e(TAG, "Error fetching favorites: " + databaseError.getMessage());
+                }
+            };
+
+            favoritesRef.addValueEventListener(favoritesValueEventListener);
+        }
+    }
+
+    private void addFavoriteView(Favorite favorite) {
+        LayoutInflater inflater = LayoutInflater.from(requireContext());
+        View favoriteView = inflater.inflate(R.layout.favorites_layout, favoriteContainer, false);
+
+        TextView nameTextView = favoriteView.findViewById(R.id.favorite_text_view);
+
+        nameTextView.setText(favorite.getName());
+
+        favoriteContainer.addView(favoriteView);
+    }
 
     private void closePopUpFragment() {
         // Go back to the previous fragment (HomeFragment)
@@ -257,6 +302,7 @@ public class PopUpFragment extends Fragment {
             }
         }
     }
+
 
 
 }
