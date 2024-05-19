@@ -255,11 +255,15 @@ public class PopUpFragment extends Fragment {
         View favoriteView = inflater.inflate(R.layout.favorites_layout, favoriteContainer, false);
 
         TextView nameTextView = favoriteView.findViewById(R.id.favorite_text_view);
+        ImageView imageView = favoriteView.findViewById(R.id.place_favorite_image_view);
 
         nameTextView.setText(favorite.getName());
 
+        fetchPlacePhoto(favorite.getName(), imageView);
+
         favoriteContainer.addView(favoriteView);
     }
+
 
     private void closePopUpFragment() {
         // Go back to the previous fragment (HomeFragment)
