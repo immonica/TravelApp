@@ -23,6 +23,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
 import com.google.android.libraries.places.api.model.TypeFilter;
@@ -37,6 +38,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +48,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap mMap;
     private DatabaseReference databaseRef;
     private Trip trip;
+    private List<Museum> museums = new ArrayList<>();
+
 
     @Nullable
     @Override
@@ -103,6 +107,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // Retrieve the last saved trip from Firebase
         getLastSavedTrip();
+
     }
 
     private void getLastSavedTrip() {
@@ -185,41 +190,64 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         placesClient.findAutocompletePredictions(request)
                 .addOnSuccessListener((response) -> {
                     List<AutocompletePrediction> predictions = response.getAutocompletePredictions();
+                    Log.d(TAG, "Number of museum predictions: " + predictions.size()); // Log the number of predictions
                     int count = 0;
                     for (AutocompletePrediction prediction : predictions) {
                         if (count >= 5) break; // Save up to 5 museum suggestions
                         String museumName = prediction.getPrimaryText(null).toString();
+                        String museumAddress = prediction.getFullText(null).toString();
+                        Log.d(TAG, "Museum name: " + museumName); // Log each museum name
+                        Log.d(TAG, "Museum address: " + museumAddress); // Log each museum address
 
-                        // Save museum suggestion to Firebase
-                        saveMuseumToFirebase(museumName, city, tripKey, uid);
+                        // Save museum suggestion to Firebase with name and address
+                        saveMuseumToFirebase(museumName, museumAddress, city, tripKey, uid);
+
                         count++;
                     }
                 })
                 .addOnFailureListener((exception) -> {
                     Log.e(TAG, "Error fetching museum suggestions: " + exception.getMessage());
                 });
+
     }
 
-    private void saveMuseumToFirebase(String museumName, String city, String tripKey, String uid) {
-        // Get a reference to the Firebase database
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+    private void saveMuseumToFirebase(String museumName, String museumAddress, String city, String tripKey, String uid) {
+        // Perform geocoding for the museum's address to obtain coordinates
+        Geocoder geocoder = new Geocoder(requireContext());
+        try {
+            List<Address> addresses = geocoder.getFromLocationName(museumAddress, 1);
+            if (!addresses.isEmpty()) {
+                Address address = addresses.get(0);
+                double latitude = address.getLatitude();
+                double longitude = address.getLongitude();
+                // Get a reference to the Firebase database
+                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
 
-        // Create a new node for the museum suggestion under the trip
-        DatabaseReference museumRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("museums").push();
+                // Create a new node for the museum suggestion under the trip
+                DatabaseReference museumRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("museums").push();
 
-        // Create a map to hold museum data
-        Map<String, Object> museumData = new HashMap<>();
-        museumData.put("name", museumName);
-        museumData.put("city", city);
+                // Create a map to hold museum data
+                Map<String, Object> museumData = new HashMap<>();
+                museumData.put("name", museumName);
+                museumData.put("address", museumAddress);
+                museumData.put("city", city);
+                museumData.put("latitude", latitude);
+                museumData.put("longitude", longitude);
 
-        // Set the data to the database
-        museumRef.setValue(museumData)
-                .addOnSuccessListener((aVoid) -> {
-                    Log.d(TAG, "Museum suggestion saved to Firebase: " + museumName);
-                })
-                .addOnFailureListener((e) -> {
-                    Log.e(TAG, "Error saving museum suggestion to Firebase: " + e.getMessage());
-                });
+                // Set the data to the database
+                museumRef.setValue(museumData)
+                        .addOnSuccessListener((aVoid) -> {
+                            Log.d(TAG, "Museum suggestion saved to Firebase: " + museumName);
+                        })
+                        .addOnFailureListener((e) -> {
+                            Log.e(TAG, "Error saving museum suggestion to Firebase: " + e.getMessage());
+                        });
+            } else {
+                Log.e(TAG, "Geocoding failed for museum: " + museumName);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
