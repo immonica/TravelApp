@@ -61,9 +61,16 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.text.SimpleDateFormat;
+import android.widget.ToggleButton;
+import android.widget.CompoundButton;
+
 
 
 import java.io.IOException;
@@ -402,7 +409,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
     private void fetchPlaceDetails(String placeId) {
         // Define fields you want to retrieve
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI);
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.LAT_LNG);
 
         // Construct a FetchPlaceRequest
         FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
@@ -424,6 +431,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         String address = place.getAddress();
         String phoneNumber = place.getPhoneNumber();
         Uri websiteUri = place.getWebsiteUri();
+        LatLng latLng = place.getLatLng();
 
         // Construct the information string
         StringBuilder info = new StringBuilder();
@@ -458,12 +466,109 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         // Fetch place photo
         fetchPlacePhoto(place, dialogView);
 
+        // Handle the favorite toggle button
+        ToggleButton toggleFavoriteButton = dialogView.findViewById(R.id.toggle_favorite_button);
+        checkIfFavorite(place.getId(), toggleFavoriteButton);  // Check and set the initial state of the toggle button
+
+        toggleFavoriteButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // Save the place to favorites
+                    saveToFavorites(place);
+                } else {
+                    // Remove the place from favorites
+                    removeFromFavorites(place.getId());
+                }
+            }
+        });
+
+
         // Show the custom dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setView(dialogView)
                 .setTitle("Place Details")
                 .setPositiveButton("OK", null)
                 .show();
+    }
+
+    // Check if the place is already in favorites and set the toggle button state
+    private void checkIfFavorite(String placeId, ToggleButton toggleFavoriteButton) {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference favRef = FirebaseDatabase.getInstance().getReference()
+                .child("users").child(uid).child("favorites").child(placeId);
+
+        favRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    toggleFavoriteButton.setChecked(true);
+                } else {
+                    toggleFavoriteButton.setChecked(false);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e(TAG, "Error checking favorite status: " + databaseError.getMessage());
+                // Handle the error here
+            }
+        });
+
+    }
+
+    // Save the place to favorites in Firebase
+    private void saveToFavorites(Place place) {
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference favRef = FirebaseDatabase.getInstance().getReference()
+                .child("users").child(uid).child("favorites").child(place.getId());
+
+        Map<String, Object> favoriteData = new HashMap<>();
+        favoriteData.put("name", place.getName());
+        favoriteData.put("address", place.getAddress());
+        favoriteData.put("latLng", place.getLatLng().latitude + "," + place.getLatLng().longitude);
+
+        favRef.setValue(favoriteData)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Place added to favorites");
+                        // Handle success (if needed)
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Error adding place to favorites: " + e.getMessage());
+                        // Handle failure here
+                    }
+                });
+
+    }
+
+    // Remove the place from favorites in Firebase
+    private void removeFromFavorites(String placeId) {
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference favRef = FirebaseDatabase.getInstance().getReference()
+                .child("users").child(uid).child("favorites").child(placeId);
+
+        favRef.removeValue()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "Place removed from favorites");
+                        // Handle success (if needed)
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "Error removing place from favorites: " + e.getMessage());
+                        // Handle failure here
+                    }
+                });
+
     }
 
     private void fetchPlacePhoto(Place place, View dialogView) {

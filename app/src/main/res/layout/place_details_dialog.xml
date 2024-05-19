@@ -51,5 +51,15 @@
         android:text="Website"
         android:textColor="@color/blue"/>
 
+    <!-- Toggle Button for Favorites -->
+    <ToggleButton
+        android:id="@+id/toggle_favorite_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:button="@drawable/toggle_favorite_selector"
+        android:background="@null"
+        android:padding="0dp"/>
+
 </LinearLayout>
 
