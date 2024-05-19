@@ -1,8 +1,11 @@
 package fragments;
 
+import static android.content.ContentValues.TAG;
+
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +23,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
+import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -29,12 +37,15 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private DatabaseReference databaseRef;
+    private Trip trip;
 
     @Nullable
     @Override
@@ -109,8 +120,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 if (dataSnapshot.exists()) {
                     // Retrieve the last trip
                     for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                        Trip trip = tripSnapshot.getValue(Trip.class);
+                        trip = tripSnapshot.getValue(Trip.class);
                         if (trip != null) {
+                            // Set the key of the trip
+                            trip.setKey(tripSnapshot.getKey());
+
                             // Extract the city from the trip data
                             String city = trip.getCity();
 
@@ -140,10 +154,72 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                 // Move the camera of the map to the city's location
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cityLocation, 12f));
+
+                // Fetch museum suggestions and save them to Firebase
+                fetchAndSaveMuseumSuggestions(city, trip.getKey());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void fetchAndSaveMuseumSuggestions(String city, String tripKey) {
+        // Use Places API to fetch museum suggestions for the city
+        String apiKey = getString(R.string.my_map_api_key);
+        Places.initialize(requireContext(), apiKey);
+        PlacesClient placesClient = Places.createClient(requireContext());
+
+        // Define the text query to search for museums in the city
+        String query = "museum in " + city;
+
+        // Create a request to fetch museum suggestions
+        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
+                .setTypeFilter(TypeFilter.ESTABLISHMENT)
+                .setQuery(query)
+                .build();
+
+        // Get the current user's UID
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Perform the search asynchronously
+        placesClient.findAutocompletePredictions(request)
+                .addOnSuccessListener((response) -> {
+                    List<AutocompletePrediction> predictions = response.getAutocompletePredictions();
+                    int count = 0;
+                    for (AutocompletePrediction prediction : predictions) {
+                        if (count >= 5) break; // Save up to 5 museum suggestions
+                        String museumName = prediction.getPrimaryText(null).toString();
+
+                        // Save museum suggestion to Firebase
+                        saveMuseumToFirebase(museumName, city, tripKey, uid);
+                        count++;
+                    }
+                })
+                .addOnFailureListener((exception) -> {
+                    Log.e(TAG, "Error fetching museum suggestions: " + exception.getMessage());
+                });
+    }
+
+    private void saveMuseumToFirebase(String museumName, String city, String tripKey, String uid) {
+        // Get a reference to the Firebase database
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
+        // Create a new node for the museum suggestion under the trip
+        DatabaseReference museumRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("museums").push();
+
+        // Create a map to hold museum data
+        Map<String, Object> museumData = new HashMap<>();
+        museumData.put("name", museumName);
+        museumData.put("city", city);
+
+        // Set the data to the database
+        museumRef.setValue(museumData)
+                .addOnSuccessListener((aVoid) -> {
+                    Log.d(TAG, "Museum suggestion saved to Firebase: " + museumName);
+                })
+                .addOnFailureListener((e) -> {
+                    Log.e(TAG, "Error saving museum suggestion to Firebase: " + e.getMessage());
+                });
     }
 
 }
