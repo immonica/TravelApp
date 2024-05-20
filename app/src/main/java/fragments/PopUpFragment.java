@@ -290,24 +290,43 @@ public class PopUpFragment extends Fragment {
     }
 
     private void removeFavoriteFromFirebase(Favorite favorite) {
-        if (favoritesRef != null) {
-            favoritesRef.child(favorite.getKey()).removeValue()
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            // Favorite removed successfully, update UI
-                            Toast.makeText(requireContext(), "Favorite removed", Toast.LENGTH_SHORT).show();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.e(TAG, "Failed to remove favorite: " + e.getMessage());
-                            Toast.makeText(requireContext(), "Failed to remove favorite", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Remove Favorite");
+        builder.setMessage("Are you sure you want to remove this from your favorites?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // User clicked Yes, proceed with removing the favorite
+                if (favoritesRef != null) {
+                    favoritesRef.child(favorite.getKey()).removeValue()
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    // Favorite removed successfully, update UI
+                                    Toast.makeText(requireContext(), "Favorite removed", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.e(TAG, "Failed to remove favorite: " + e.getMessage());
+                                    Toast.makeText(requireContext(), "Failed to remove favorite", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // User clicked No, dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
+
 
 
     private void closePopUpFragment() {
