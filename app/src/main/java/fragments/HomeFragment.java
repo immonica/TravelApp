@@ -492,6 +492,52 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 .show();
     }
 
+    private void fetchPlacePhoto(Place place, View dialogView) {
+        // Define the fields to be returned for the photo
+        List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS);
+
+        // Construct a FetchPlaceRequest
+        FetchPlaceRequest request = FetchPlaceRequest.newInstance(place.getId(), fields);
+
+        // Fetch place details asynchronously
+        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+            Place fetchedPlace = response.getPlace();
+            // Get the photo metadata
+            List<PhotoMetadata> photoMetadataList = fetchedPlace.getPhotoMetadatas();
+            if (photoMetadataList != null && !photoMetadataList.isEmpty()) {
+                // Get the first photo metadata
+                PhotoMetadata photoMetadata = photoMetadataList.get(0);
+
+                // Create a FetchPhotoRequest
+                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                        .setMaxHeight(1600) // Set maximum height of the photo
+                        .setMaxWidth(1600) // Set maximum width of the photo
+                        .build();
+
+                // Fetch the photo asynchronously
+                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+                    Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                    // Display the photo in your ImageView
+                    if (bitmap != null) {
+                        // Set the fetched photo bitmap to the ImageView in the dialog layout
+                        ImageView imageView = dialogView.findViewById(R.id.place_photo_image_view);
+                        if (imageView != null) {
+                            imageView.setImageBitmap(bitmap);
+                            imageView.setVisibility(View.VISIBLE); // Set visibility to VISIBLE
+                        }
+                    }
+                }).addOnFailureListener((exception) -> {
+                    // Handle photo fetch failure
+                    Log.e(TAG, "Place photo not found: " + exception.getMessage());
+                });
+            }
+        }).addOnFailureListener((exception) -> {
+            // Handle fetch failure
+            Log.e(TAG, "Place not found: " + exception.getMessage());
+        });
+    }
+
+
     // Check if the place is already in favorites and set the toggle button state
     private void checkIfFavorite(String placeId, ToggleButton toggleFavoriteButton) {
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -573,50 +619,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
     }
 
-    private void fetchPlacePhoto(Place place, View dialogView) {
-        // Define the fields to be returned for the photo
-        List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS);
-
-        // Construct a FetchPlaceRequest
-        FetchPlaceRequest request = FetchPlaceRequest.newInstance(place.getId(), fields);
-
-        // Fetch place details asynchronously
-        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-            Place fetchedPlace = response.getPlace();
-            // Get the photo metadata
-            List<PhotoMetadata> photoMetadataList = fetchedPlace.getPhotoMetadatas();
-            if (photoMetadataList != null && !photoMetadataList.isEmpty()) {
-                // Get the first photo metadata
-                PhotoMetadata photoMetadata = photoMetadataList.get(0);
-
-                // Create a FetchPhotoRequest
-                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                        .setMaxHeight(1600) // Set maximum height of the photo
-                        .setMaxWidth(1600) // Set maximum width of the photo
-                        .build();
-
-                // Fetch the photo asynchronously
-                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
-                    Bitmap bitmap = fetchPhotoResponse.getBitmap();
-                    // Display the photo in your ImageView
-                    if (bitmap != null) {
-                        // Set the fetched photo bitmap to the ImageView in the dialog layout
-                        ImageView imageView = dialogView.findViewById(R.id.place_photo_image_view);
-                        if (imageView != null) {
-                            imageView.setImageBitmap(bitmap);
-                            imageView.setVisibility(View.VISIBLE); // Set visibility to VISIBLE
-                        }
-                    }
-                }).addOnFailureListener((exception) -> {
-                    // Handle photo fetch failure
-                    Log.e(TAG, "Place photo not found: " + exception.getMessage());
-                });
-            }
-        }).addOnFailureListener((exception) -> {
-            // Handle fetch failure
-            Log.e(TAG, "Place not found: " + exception.getMessage());
-        });
-    }
 
     private void performTextSearch(String query) {
         // Create a new PlacesClient instance

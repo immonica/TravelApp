@@ -6,18 +6,20 @@ public class Museum {
     private String address; // Add address field
     private double latitude;
     private double longitude;
+    private String placeId;
 
     // Default constructor (no-argument constructor) required by Firebase
     public Museum() {
         // Default constructor required by Firebase
     }
 
-    public Museum(String name, String city, String address, double latitude, double longitude) {
+    public Museum(String name, String city, String address, double latitude, double longitude, String placeId) {
         this.name = name;
         this.city = city;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.placeId = placeId;
     }
 
     public String getName() {
@@ -58,5 +60,13 @@ public class Museum {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
     }
 }

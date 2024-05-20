@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/layout/dialog_place_details.xml -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/grey"
+    android:padding="16dp">
+
+    <!-- Image View for Photo -->
+    <ImageView
+        android:id="@+id/place_photo_image_view_trip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scaleType="centerCrop"
+        android:adjustViewBounds="true"
+        android:src="@drawable/placeholder_image" />
+
+    <!-- Text Views for Details -->
+    <TextView
+        android:id="@+id/place_name_text_view_trip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Name"
+        android:textColor="@color/blue"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/place_address_text_view_trip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Address"
+        android:textColor="@color/blue"/>
+
+    <TextView
+        android:id="@+id/place_phone_text_view_trip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Phone"
+        android:textColor="@color/blue"/>
+
+    <TextView
+        android:id="@+id/place_website_text_view_trip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:text="Website"
+        android:textColor="@color/blue"/>
+</LinearLayout>
+

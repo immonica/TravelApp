@@ -2,14 +2,20 @@ package fragments;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.AlertDialog;
+import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,10 +29,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.AutocompletePrediction;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
+import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.model.TypeFilter;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
+import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,6 +50,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +62,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private Trip trip;
     private List<Museum> museums = new ArrayList<>();
     private boolean museumSuggestionsFetchedAndSaved = false;
+    private PlacesClient placesClient;
 
 
     @Nullable
@@ -59,6 +72,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // Initialize Firebase database reference
         databaseRef = FirebaseDatabase.getInstance().getReference();
+
+        Places.initialize(getActivity(), getString(R.string.my_map_api_key));
+        placesClient = Places.createClient(requireContext());
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -105,6 +121,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Object tag = marker.getTag();
+                if (tag != null) {
+                    // Obtain placeId from marker tag
+                    String placeId = tag.toString();
+
+                    // Use placeId to fetch place details
+                    fetchPlaceDetails(placeId);
+                } else {
+                    Log.e(TAG, "Marker tag is null");
+                }
+                return true;
+            }
+        });
+
 
         // Retrieve the last saved trip from Firebase
         getLastSavedTrip();
@@ -213,8 +247,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 Address address = addresses.get(0);
                                 double latitude = address.getLatitude();
                                 double longitude = address.getLongitude();
-                                // Create a new Museum instance
-                                Museum museum = new Museum(museumName, city, museumAddress, latitude, longitude);
+
+                                // Get the placeId from prediction
+                                String placeId = prediction.getPlaceId();
+
+                                // Create a new Museum instance with placeId
+                                Museum museum = new Museum(museumName, city, museumAddress, latitude, longitude, placeId);
                                 saveMuseumToFirebase(museum, tripKey);
                             } else {
                                 Log.e(TAG, "Geocoding failed for museum: " + museumName);
@@ -225,6 +263,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                         count++;
                     }
+
                     // Call displayMuseumMarkers after fetching and saving museum suggestions
                     displayMuseumMarkers(tripKey);
                 })
@@ -287,7 +326,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
                         // Add a marker on the map for the museum
                         LatLng museumLocation = new LatLng(latitude, longitude);
-                        mMap.addMarker(new MarkerOptions().position(museumLocation).title(museumName));
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(museumLocation).title(museumName));
+
+                        // Set the marker tag as the placeId associated with the museum
+                        marker.setTag(museum.getPlaceId());
                     }
                 }
             }
@@ -299,5 +341,118 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
     }
+
+    private void fetchPlaceDetails(String placeId) {
+        // Define fields you want to retrieve
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.LAT_LNG);
+
+        // Construct a FetchPlaceRequest
+        FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
+
+        // Fetch place details asynchronously
+        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+            Place place = response.getPlace();
+            // Handle fetched place details
+            displayPlaceDetails(place);
+        }).addOnFailureListener((exception) -> {
+            // Handle fetch failure
+            Log.e(TAG, "Place not found: " + exception.getMessage());
+        });
+    }
+
+    private void displayPlaceDetails(Place place) {
+        // Get the place details
+        String name = place.getName();
+        String address = place.getAddress();
+        String phoneNumber = place.getPhoneNumber();
+        Uri websiteUri = place.getWebsiteUri();
+        LatLng latLng = place.getLatLng();
+
+        // Construct the information string
+        StringBuilder info = new StringBuilder();
+        info.append("Name: ").append(name).append("\n");
+        info.append("Address: ").append(address).append("\n");
+        info.append("Phone: ").append(phoneNumber).append("\n");
+
+        if (websiteUri != null) {
+            info.append("Website: ").append(websiteUri.toString());
+        }
+
+        // Inflate the custom dialog layout
+        View dialogView = getLayoutInflater().inflate(R.layout.place_details_dialog_trip, null);
+
+        // Set the place details to the TextViews in the custom dialog layout
+        TextView placeNameTextView = dialogView.findViewById(R.id.place_name_text_view_trip);
+        placeNameTextView.setText(name);
+
+        TextView placeAddressTextView = dialogView.findViewById(R.id.place_address_text_view_trip);
+        placeAddressTextView.setText(address);
+
+        TextView placePhoneTextView = dialogView.findViewById(R.id.place_phone_text_view_trip);
+        placePhoneTextView.setText(phoneNumber);
+
+        TextView placeWebsiteTextView = dialogView.findViewById(R.id.place_website_text_view_trip);
+        if (websiteUri != null) {
+            placeWebsiteTextView.setText(websiteUri.toString());
+        } else {
+            placeWebsiteTextView.setVisibility(View.GONE);
+        }
+
+        // Fetch place photo
+        fetchPlacePhoto(place, dialogView);
+
+        // Show the custom dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setView(dialogView)
+                .setTitle("Place Details")
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private void fetchPlacePhoto(Place place, View dialogView) {
+        // Define the fields to be returned for the photo
+        List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS);
+
+        // Construct a FetchPlaceRequest
+        FetchPlaceRequest request = FetchPlaceRequest.newInstance(place.getId(), fields);
+
+        // Fetch place details asynchronously
+        placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
+            Place fetchedPlace = response.getPlace();
+            // Get the photo metadata
+            List<PhotoMetadata> photoMetadataList = fetchedPlace.getPhotoMetadatas();
+            if (photoMetadataList != null && !photoMetadataList.isEmpty()) {
+                // Get the first photo metadata
+                PhotoMetadata photoMetadata = photoMetadataList.get(0);
+
+                // Create a FetchPhotoRequest
+                FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                        .setMaxHeight(1600) // Set maximum height of the photo
+                        .setMaxWidth(1600) // Set maximum width of the photo
+                        .build();
+
+                // Fetch the photo asynchronously
+                placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+                    Bitmap bitmap = fetchPhotoResponse.getBitmap();
+                    // Display the photo in your ImageView
+                    if (bitmap != null) {
+                        // Set the fetched photo bitmap to the ImageView in the dialog layout
+                        ImageView imageView = dialogView.findViewById(R.id.place_photo_image_view_trip);
+                        if (imageView != null) {
+                            imageView.setImageBitmap(bitmap);
+                            imageView.setVisibility(View.VISIBLE); // Set visibility to VISIBLE
+                        }
+                    }
+                }).addOnFailureListener((exception) -> {
+                    // Handle photo fetch failure
+                    Log.e(TAG, "Place photo not found: " + exception.getMessage());
+                });
+            }
+        }).addOnFailureListener((exception) -> {
+            // Handle fetch failure
+            Log.e(TAG, "Place not found: " + exception.getMessage());
+        });
+    }
+
 
 }
