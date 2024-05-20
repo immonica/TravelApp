@@ -4,6 +4,7 @@ public class Favorite {
     private String name;
     private String address;
     private String latLng;
+    private String key;
 
     // Default constructor required for calls to DataSnapshot.getValue(Favorite.class)
     public Favorite() {
@@ -37,5 +38,14 @@ public class Favorite {
 
     public void setLatLng(String latLng) {
         this.latLng = latLng;
+    }
+
+    // Getter and setter for the key field
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

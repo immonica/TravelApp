@@ -229,7 +229,7 @@
         android:layout_marginTop="40dp"
         android:layout_marginStart="20dp"/>
 
-    <!-- HorizontalScrollView Favorites-->
+    <!-- HorizontalScrollView for favorite locations -->
     <HorizontalScrollView
         android:id="@+id/horizontalScrollView2_favorites"
         android:layout_width="match_parent"
@@ -244,147 +244,37 @@
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="2in"
-                android:layout_height="1in"
-                android:layout_margin="5dp"
-                app:cardBackgroundColor="@color/grey"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:scaleType="fitXY" />
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:background="#65FFFCFC"
-                    android:gravity="center|bottom"
-                    android:text="This Is Horizontal ScrollView"
-                    android:textColor="@color/blue"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="2in"
-                android:layout_height="1in"
-                android:layout_margin="5dp"
-                app:cardBackgroundColor="@color/grey"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:scaleType="fitXY"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:background="#65FFFCFC"
-                    android:gravity="center|bottom"
-                    android:text="This Is Horizontal ScrollView"
-                    android:textColor="@color/blue"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="2in"
-                android:layout_height="1in"
-                android:layout_margin="5dp"
-                app:cardBackgroundColor="@color/grey"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:scaleType="fitXY"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:background="#65FFFCFC"
-                    android:gravity="center|bottom"
-                    android:text="This Is Horizontal ScrollView"
-                    android:textColor="@color/blue"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="2in"
-                android:layout_height="1in"
-                android:layout_margin="5dp"
-                app:cardBackgroundColor="@color/grey"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:scaleType="fitXY"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:background="#65FFFCFC"
-                    android:gravity="center|bottom"
-                    android:text="This Is Horizontal ScrollView"
-                    android:textColor="@color/blue"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="2in"
-                android:layout_height="1in"
-                android:layout_margin="5dp"
-                app:cardBackgroundColor="@color/grey"
-                app:cardCornerRadius="10dp"
-                app:cardElevation="5dp">
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@color/white"
-                    android:scaleType="fitXY"/>
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:background="#65FFFCFC"
-                    android:gravity="center|bottom"
-                    android:text="This Is Horizontal ScrollView"
-                    android:textColor="@color/blue"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-            </androidx.cardview.widget.CardView>
-
+            <!-- Include favorite_location_card.xml multiple times -->
+            <include layout="@layout/favorites_layout" />
+            <include layout="@layout/favorites_layout" />
+            <include layout="@layout/favorites_layout" />
+            <include layout="@layout/favorites_layout" />
+            <include layout="@layout/favorites_layout" />
         </LinearLayout>
     </HorizontalScrollView>
+
+    <!-- Guideline to position the logout button at the bottom -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_bottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9" />
 
     <!-- Logout Button -->
     <Button
         android:id="@+id/logout_button"
         android:layout_width="150dp"
         android:layout_height="50dp"
-        android:layout_marginStart="128dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/ripple_effect"
         android:text="Logout"
         android:textColor="@color/grey"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/guideline_bottom"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

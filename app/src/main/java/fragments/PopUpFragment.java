@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,6 +20,8 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.travelapp.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
@@ -232,10 +235,22 @@ public class PopUpFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     favoriteContainer.removeAllViews(); // Clear previous views
-                    for (DataSnapshot favoriteSnapshot : dataSnapshot.getChildren()) {
-                        Favorite favorite = favoriteSnapshot.getValue(Favorite.class);
-                        if (favorite != null) {
-                            addFavoriteView(favorite);
+                    if (dataSnapshot.getChildrenCount() == 0) {
+                        // If no favorites, display a message
+                        TextView noFavoritesTextView = new TextView(requireContext());
+                        noFavoritesTextView.setText("No favorite locations");
+                        noFavoritesTextView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
+                        noFavoritesTextView.setTextSize(18);
+                        noFavoritesTextView.setPadding(16, 16, 16, 16);
+
+                        favoriteContainer.addView(noFavoritesTextView);
+                    } else {
+                        // If favorites exist, populate the ScrollView
+                        for (DataSnapshot favoriteSnapshot : dataSnapshot.getChildren()) {
+                            Favorite favorite = favoriteSnapshot.getValue(Favorite.class);
+                            if (favorite != null) {
+                                addFavoriteView(favorite);
+                            }
                         }
                     }
                 }
@@ -250,18 +265,48 @@ public class PopUpFragment extends Fragment {
         }
     }
 
+
     private void addFavoriteView(Favorite favorite) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View favoriteView = inflater.inflate(R.layout.favorites_layout, favoriteContainer, false);
 
         TextView nameTextView = favoriteView.findViewById(R.id.favorite_text_view);
         ImageView imageView = favoriteView.findViewById(R.id.place_favorite_image_view);
+        Button removeButton = favoriteView.findViewById(R.id.remove_favorite_button); // Add this line
 
         nameTextView.setText(favorite.getName());
 
         fetchPlacePhoto(favorite.getName(), imageView);
 
+        removeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Remove the favorite from Firebase
+                removeFavoriteFromFirebase(favorite);
+            }
+        });
+
         favoriteContainer.addView(favoriteView);
+    }
+
+    private void removeFavoriteFromFirebase(Favorite favorite) {
+        if (favoritesRef != null) {
+            favoritesRef.child(favorite.getKey()).removeValue()
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            // Favorite removed successfully, update UI
+                            Toast.makeText(requireContext(), "Favorite removed", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.e(TAG, "Failed to remove favorite: " + e.getMessage());
+                            Toast.makeText(requireContext(), "Failed to remove favorite", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 
 
