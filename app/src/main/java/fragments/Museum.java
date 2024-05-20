@@ -7,6 +7,11 @@ public class Museum {
     private double latitude;
     private double longitude;
 
+    // Default constructor (no-argument constructor) required by Firebase
+    public Museum() {
+        // Default constructor required by Firebase
+    }
+
     public Museum(String name, String city, String address, double latitude, double longitude) {
         this.name = name;
         this.city = city;

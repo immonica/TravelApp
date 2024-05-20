@@ -49,6 +49,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private DatabaseReference databaseRef;
     private Trip trip;
     private List<Museum> museums = new ArrayList<>();
+    private boolean museumSuggestionsFetchedAndSaved = false;
 
 
     @Nullable
@@ -160,14 +161,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 // Move the camera of the map to the city's location
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cityLocation, 12f));
 
-                // Fetch museum suggestions and save them to Firebase
-                fetchAndSaveMuseumSuggestions(city, trip.getKey());
+                if (!museumSuggestionsFetchedAndSaved) {
+                    // Fetch museum suggestions and save them to Firebase
+                    fetchAndSaveMuseumSuggestions(city, trip.getKey());
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    // Inside your MapFragment class
+
+    // Add this method below your other methods in the class
     private void fetchAndSaveMuseumSuggestions(String city, String tripKey) {
         // Use Places API to fetch museum suggestions for the city
         String apiKey = getString(R.string.my_map_api_key);
@@ -199,55 +205,99 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         Log.d(TAG, "Museum name: " + museumName); // Log each museum name
                         Log.d(TAG, "Museum address: " + museumAddress); // Log each museum address
 
-                        // Save museum suggestion to Firebase with name and address
-                        saveMuseumToFirebase(museumName, museumAddress, city, tripKey, uid);
+                        // Perform geocoding for the museum's address to obtain coordinates
+                        Geocoder geocoder = new Geocoder(requireContext());
+                        try {
+                            List<Address> addresses = geocoder.getFromLocationName(museumAddress, 1);
+                            if (!addresses.isEmpty()) {
+                                Address address = addresses.get(0);
+                                double latitude = address.getLatitude();
+                                double longitude = address.getLongitude();
+                                // Create a new Museum instance
+                                Museum museum = new Museum(museumName, city, museumAddress, latitude, longitude);
+                                saveMuseumToFirebase(museum, tripKey);
+                            } else {
+                                Log.e(TAG, "Geocoding failed for museum: " + museumName);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
                         count++;
                     }
+                    // Call displayMuseumMarkers after fetching and saving museum suggestions
+                    displayMuseumMarkers(tripKey);
                 })
                 .addOnFailureListener((exception) -> {
                     Log.e(TAG, "Error fetching museum suggestions: " + exception.getMessage());
                 });
 
+        museumSuggestionsFetchedAndSaved = true;
     }
 
-    private void saveMuseumToFirebase(String museumName, String museumAddress, String city, String tripKey, String uid) {
-        // Perform geocoding for the museum's address to obtain coordinates
-        Geocoder geocoder = new Geocoder(requireContext());
-        try {
-            List<Address> addresses = geocoder.getFromLocationName(museumAddress, 1);
-            if (!addresses.isEmpty()) {
-                Address address = addresses.get(0);
-                double latitude = address.getLatitude();
-                double longitude = address.getLongitude();
-                // Get a reference to the Firebase database
-                DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
 
-                // Create a new node for the museum suggestion under the trip
-                DatabaseReference museumRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("museums").push();
+    // Inside your MapFragment class
 
-                // Create a map to hold museum data
-                Map<String, Object> museumData = new HashMap<>();
-                museumData.put("name", museumName);
-                museumData.put("address", museumAddress);
-                museumData.put("city", city);
-                museumData.put("latitude", latitude);
-                museumData.put("longitude", longitude);
+    // Add this method below your other methods in the class
+    private void saveMuseumToFirebase(Museum museum, String tripKey) {
+        // Get the current user's UID
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-                // Set the data to the database
-                museumRef.setValue(museumData)
-                        .addOnSuccessListener((aVoid) -> {
-                            Log.d(TAG, "Museum suggestion saved to Firebase: " + museumName);
-                        })
-                        .addOnFailureListener((e) -> {
-                            Log.e(TAG, "Error saving museum suggestion to Firebase: " + e.getMessage());
-                        });
-            } else {
-                Log.e(TAG, "Geocoding failed for museum: " + museumName);
+        // Get a reference to the Firebase database
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
+        // Create a new node for the museum suggestion under the trip
+        DatabaseReference museumRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("museums").push();
+
+        // Set the Museum object as the value for the database reference
+        museumRef.setValue(museum)
+                .addOnSuccessListener((aVoid) -> {
+                    Log.d(TAG, "Museum suggestion saved to Firebase: " + museum.getName());
+                })
+                .addOnFailureListener((e) -> {
+                    Log.e(TAG, "Error saving museum suggestion to Firebase: " + e.getMessage());
+                });
+    }
+
+    private void displayMuseumMarkers(String tripKey) {
+        // Get the current user's UID
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Get a reference to the Firebase database
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+
+        // Get a reference to the museums node under the trip
+        DatabaseReference museumsRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("museums");
+
+
+        // Attach a ValueEventListener to retrieve the museums
+        museumsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Iterate through each museum
+                for (DataSnapshot museumSnapshot : dataSnapshot.getChildren()) {
+                    // Create a Museum object from the snapshot
+                    Museum museum = museumSnapshot.getValue(Museum.class);
+                    if (museum != null) {
+                        // Get museum details
+                        String museumName = museum.getName();
+                        String museumAddress = museum.getAddress();
+                        double latitude = museum.getLatitude();
+                        double longitude = museum.getLongitude();
+
+                        // Add a marker on the map for the museum
+                        LatLng museumLocation = new LatLng(latitude, longitude);
+                        mMap.addMarker(new MarkerOptions().position(museumLocation).title(museumName));
+                    }
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle database error
+                Log.e(TAG, "Error fetching museums from Firebase: " + databaseError.getMessage());
+            }
+        });
     }
 
 }
