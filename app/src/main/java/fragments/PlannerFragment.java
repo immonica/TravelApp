@@ -120,7 +120,6 @@ public class PlannerFragment extends Fragment {
             }
         }).attach();
     }
-
     private void onDeleteButtonClick() {
         // Navigate back to the previous fragment in the back stack
         if (getFragmentManager() != null) {

@@ -3,27 +3,31 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background_popup">
+
 
     <ScrollView
-        android:id="@+id/day_scroll_view"
+        android:id="@+id/verticalScrollView_itinerary"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:layout_margin="16dp">
+        android:overScrollMode="never"
+        android:scrollbars="vertical">
 
         <LinearLayout
-            android:id="@+id/day_content_layout"
+            android:id="@+id/itinerary_container"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_vertical|center_horizontal">
+
             <!-- Include favorite_location_card.xml multiple times -->
             <include layout="@layout/itinerary_layout" />
             <include layout="@layout/itinerary_layout" />
             <include layout="@layout/itinerary_layout" />
             <include layout="@layout/itinerary_layout" />
             <include layout="@layout/itinerary_layout" />
+
         </LinearLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

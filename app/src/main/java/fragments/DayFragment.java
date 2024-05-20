@@ -31,7 +31,7 @@ public class DayFragment extends Fragment {
 
         // Retrieve position from arguments and display corresponding text
         int position = getArguments().getInt(ARG_POSITION);
-        TextView dayText = view.findViewById(R.id.day_text);
+        TextView dayText = view.findViewById(R.id.itinerary_text_view);
         dayText.setText("Text " + (position + 1));
 
         return view;

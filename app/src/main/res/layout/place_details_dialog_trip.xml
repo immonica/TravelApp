@@ -50,5 +50,16 @@
         android:layout_marginTop="4dp"
         android:text="Website"
         android:textColor="@color/blue"/>
-</LinearLayout>
 
+    <!-- Button to Save to Itinerary -->
+    <Button
+        android:id="@+id/save_to_itinerary_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:text="Save to Itinerary"
+        android:textColor="@color/blue"
+        android:textStyle="bold"
+        android:background="@drawable/ripple_effect"/>
+</LinearLayout>
