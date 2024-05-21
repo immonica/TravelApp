@@ -3,6 +3,7 @@ package fragments;
 import static android.content.ContentValues.TAG;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
@@ -12,9 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import androidx.annotation.NonNull;
@@ -51,6 +55,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -407,6 +412,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .setTitle("Place Details")
                 .setPositiveButton("OK", null)
                 .show();
+
+        // Handle the Save to Itinerary button click
+        Button saveToItineraryButton = dialogView.findViewById(R.id.save_to_itinerary_button);
+        saveToItineraryButton.setOnClickListener(v -> showDatePickerDialog(place.getId(), name, address, trip.getKey()));
     }
 
     private void fetchPlacePhoto(Place place, View dialogView) {
@@ -452,6 +461,66 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             // Handle fetch failure
             Log.e(TAG, "Place not found: " + exception.getMessage());
         });
+    }
+
+    private void showDatePickerDialog(String placeId, String placeName, String placeAddress, String tripKey) {
+        // Get the current user's UID
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Fetch the days for the current trip from Firebase
+        databaseRef.child("users").child(uid).child("trips").child(tripKey).child("days")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        List<String> days = new ArrayList<>();
+                        for (DataSnapshot daySnapshot : dataSnapshot.getChildren()) {
+                            days.add(daySnapshot.getValue(String.class));
+                        }
+
+                        // Convert the list of days to an array
+                        String[] daysArray = days.toArray(new String[0]);
+
+                        // Show an AlertDialog with the available days
+                        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                        builder.setTitle("Select a Day")
+                                .setSingleChoiceItems(daysArray, -1, (dialog, which) -> {
+                                    // Get the selected day
+                                    String selectedDate = daysArray[which];
+                                    // Save the place to the selected day in the itinerary
+                                    savePlaceToItinerary(uid, tripKey, selectedDate, placeId, placeName, placeAddress);
+                                    // Dismiss the dialog
+                                    dialog.dismiss();
+                                })
+                                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
+                                .show();
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        // Handle database error
+                        Log.e(TAG, "Error fetching days from Firebase: " + databaseError.getMessage());
+                    }
+                });
+    }
+
+    private void savePlaceToItinerary(String uid, String tripKey, String selectedDate, String placeId, String placeName, String placeAddress) {
+        // Get a reference to the Firebase database
+        DatabaseReference itineraryRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("itinerary").child(selectedDate).push();
+
+        // Create a map to store place details
+        Map<String, String> placeDetails = new HashMap<>();
+        placeDetails.put("placeId", placeId);
+        placeDetails.put("name", placeName);
+        placeDetails.put("address", placeAddress);
+
+        // Save place details to the selected date in the itinerary
+        itineraryRef.setValue(placeDetails)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(requireContext(), "Place saved to itinerary", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e(TAG, "Error saving place to itinerary: " + e.getMessage());
+                });
     }
 
 
