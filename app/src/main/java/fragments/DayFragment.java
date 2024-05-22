@@ -2,21 +2,27 @@ package fragments;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.travelapp.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.libraries.places.api.Places;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
@@ -24,6 +30,14 @@ import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +48,7 @@ public class DayFragment extends Fragment {
     private static final String ARG_DAY = "day";
     private static final String ARG_ITINERARY = "itinerary";
     private PlacesClient placesClient;
+    private DatabaseReference tripRef;
 
     public static DayFragment newInstance(String day, List<String> itinerary) {
         DayFragment fragment = new DayFragment();
@@ -52,6 +67,13 @@ public class DayFragment extends Fragment {
         Places.initialize(requireContext(), getString(R.string.my_map_api_key));
         placesClient = Places.createClient(requireContext());
 
+        // Initialize Firebase reference
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            tripRef = FirebaseDatabase.getInstance().getReference()
+                    .child("users").child(currentUser.getUid()).child("trips");
+        }
+
         if (getArguments() != null) {
             String day = getArguments().getString(ARG_DAY);
             List<String> itinerary = getArguments().getStringArrayList(ARG_ITINERARY);
@@ -69,10 +91,21 @@ public class DayFragment extends Fragment {
                     View itineraryView = layoutInflater.inflate(R.layout.itinerary_layout, dayContentLayout, false);
                     TextView itineraryTextView = itineraryView.findViewById(R.id.itinerary_text_view);
                     ImageView imageView = itineraryView.findViewById(R.id.place_itinerary_image_view);
+                    //Button removeButton = itineraryView.findViewById(R.id.remove_itinerary_button);
 
                     itineraryTextView.setText(place);
                     // Fetch and set photo for the place
                     fetchPlacePhoto(place, imageView);
+
+                    // Set click listener for remove button
+                   /* removeButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            // Remove the location from Firebase
+                            removeFromFirebase(place, day);
+                        }
+                    });*/
+
                     dayContentLayout.addView(itineraryView);
                 }
             }
@@ -128,4 +161,5 @@ public class DayFragment extends Fragment {
             Log.e(TAG, "Place not found: " + exception.getMessage());
         });
     }
+
 }
