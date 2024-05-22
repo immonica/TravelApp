@@ -67,6 +67,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private PlacesClient placesClient;
     private int museumsFetchedCount = 0;
     private int parksFetchedCount = 0;
+    private int restaurantsFetchedCount = 0;
+    private int cafesFetchedCount = 0;
+    private int hotelsFetchedCount = 0;
+    private int giftShopsFetchedCount = 0;
+    private int touristAttractionsFetchedCount = 0;
+    private int barsFetchedCount = 0;
 
 
     @Nullable
@@ -198,11 +204,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 // Move the camera of the map to the city's location
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cityLocation, 12f));
 
-                // Fetch park suggestions and save them to Firebase
-                fetchAndSavePlaceSuggestions(city, trip.getKey(), "park", "parks");
-
-                // Fetch museum suggestions and save them to Firebase
+                // Fetch suggestions and save them to Firebase
                 fetchAndSavePlaceSuggestions(city, trip.getKey(), "museum", "museums");
+                fetchAndSavePlaceSuggestions(city, trip.getKey(), "park", "parks");
+                fetchAndSavePlaceSuggestions(city, trip.getKey(), "restaurant", "restaurants");
+                fetchAndSavePlaceSuggestions(city, trip.getKey(), "gift_shop", "shops");
+                fetchAndSavePlaceSuggestions(city, trip.getKey(), "cafe", "cafes");
+                fetchAndSavePlaceSuggestions(city, trip.getKey(), "bar", "bars");
+                fetchAndSavePlaceSuggestions(city, trip.getKey(), "hotel", "hotels");
+                fetchAndSavePlaceSuggestions(city, trip.getKey(), "tourist_attraction", "attractions");
 
             } else {
                 Log.e(TAG, "Geocoding failed for city: " + city);
@@ -277,12 +287,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         museumsFetchedCount++;
                     } else if (placeType.equals("park")) {
                         parksFetchedCount++;
+                    }else if (placeType.equals("restaurant")) {
+                        restaurantsFetchedCount++;
+                    }else if (placeType.equals("cafe")) {
+                        cafesFetchedCount++;
+                    }else if (placeType.equals("hotel")) {
+                        hotelsFetchedCount++;
+                    }else if (placeType.equals("gift_shop")) {
+                        giftShopsFetchedCount++;
+                    }else if (placeType.equals("tourist_attraction")) {
+                        touristAttractionsFetchedCount++;
+                    }else if (placeType.equals("bar")) {
+                        barsFetchedCount++;
                     }
 
                     // Check if both museums and parks fetch operations are completed
-                    if (museumsFetchedCount >= 5 && parksFetchedCount >= 5) {
+                    if (museumsFetchedCount >= 5 && parksFetchedCount >= 5 && restaurantsFetchedCount >= 5 && cafesFetchedCount >= 5 && hotelsFetchedCount >= 5 && giftShopsFetchedCount >= 5 && touristAttractionsFetchedCount >= 5 && barsFetchedCount >= 5) {
                         museumsFetchedCount = 0;
                         parksFetchedCount = 0;
+                        restaurantsFetchedCount = 0;
+                        cafesFetchedCount = 0;
+                        hotelsFetchedCount = 0;
+                        giftShopsFetchedCount = 0;
+                        touristAttractionsFetchedCount = 0;
+                        barsFetchedCount = 0;
                     }
 
                 })
