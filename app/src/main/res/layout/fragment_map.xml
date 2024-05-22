@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -15,6 +14,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
 
     <!-- Navigation Bar -->
     <LinearLayout
@@ -57,5 +57,121 @@
         app:layout_constraintEnd_toEndOf="@id/navigation_bar"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="5dp" />
+
+    <!-- Text Boxes 1 -->
+    <TextView
+        android:id="@+id/museum_button"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:text="Museum"
+        android:gravity="center"
+        android:textColor="@color/grey"
+        android:background="@color/blue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/attraction_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/attraction_button"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:text="Atraction"
+        android:gravity="center"
+        android:textColor="@color/grey"
+        android:background="@color/blue"
+        app:layout_constraintStart_toEndOf="@id/museum_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/park_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/park_button"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:text="Park"
+        android:gravity="center"
+        android:textColor="@color/grey"
+        android:background="@color/blue"
+        app:layout_constraintStart_toEndOf="@id/attraction_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/hotel_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"/>
+
+    <TextView
+        android:id="@+id/hotel_button"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:text="Hotel"
+        android:gravity="center"
+        android:textColor="@color/grey"
+        android:background="@color/blue"
+        app:layout_constraintStart_toEndOf="@id/park_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"/>
+
+    <!-- Text Boxes 2 -->
+    <TextView
+        android:id="@+id/cafe_button"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:text="Cafe"
+        android:gravity="center"
+        android:textColor="@color/grey"
+        android:background="@color/blue"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/museum_button"
+        app:layout_constraintEnd_toStartOf="@id/bar_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:id="@+id/bar_button"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:text="Bar"
+        android:gravity="center"
+        android:textColor="@color/grey"
+        android:background="@color/blue"
+        app:layout_constraintStart_toEndOf="@id/cafe_button"
+        app:layout_constraintTop_toBottomOf="@id/attraction_button"
+        app:layout_constraintEnd_toStartOf="@id/food_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:id="@+id/food_button"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:text="Food"
+        android:gravity="center"
+        android:textColor="@color/grey"
+        android:background="@color/blue"
+        app:layout_constraintStart_toEndOf="@id/bar_button"
+        app:layout_constraintTop_toBottomOf="@id/park_button"
+        app:layout_constraintEnd_toStartOf="@id/shop_button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"/>
+
+    <TextView
+        android:id="@+id/shop_button"
+        android:layout_width="0dp"
+        android:layout_height="30dp"
+        android:text="Shop"
+        android:gravity="center"
+        android:textColor="@color/grey"
+        android:background="@color/blue"
+        app:layout_constraintStart_toEndOf="@id/food_button"
+        app:layout_constraintTop_toBottomOf="@id/hotel_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="16dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

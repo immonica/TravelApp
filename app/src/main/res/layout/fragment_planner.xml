@@ -7,6 +7,22 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background_popup">
 
+    <!-- Text Box -->
+    <TextView
+        android:id="@+id/text_box"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:text="Your Itinerary"
+        android:textSize="25sp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textColor="@color/blue"
+        android:background="@drawable/ripple_effect"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"/>
+
     <!-- Delete Button -->
     <ImageButton
         android:id="@+id/delete_button"
@@ -19,6 +35,7 @@
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"/>
+
 
     <!-- TabLayout for Day Navigation -->
     <com.google.android.material.tabs.TabLayout

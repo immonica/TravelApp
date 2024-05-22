@@ -97,15 +97,6 @@ public class DayFragment extends Fragment {
                     // Fetch and set photo for the place
                     fetchPlacePhoto(place, imageView);
 
-                    // Set click listener for remove button
-                   /* removeButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            // Remove the location from Firebase
-                            removeFromFirebase(place, day);
-                        }
-                    });*/
-
                     dayContentLayout.addView(itineraryView);
                 }
             }

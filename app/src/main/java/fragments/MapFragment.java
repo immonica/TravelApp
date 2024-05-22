@@ -73,6 +73,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private int giftShopsFetchedCount = 0;
     private int touristAttractionsFetchedCount = 0;
     private int barsFetchedCount = 0;
+    private boolean suggestionsFetched = false;
 
 
     @Nullable
@@ -204,15 +205,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 // Move the camera of the map to the city's location
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cityLocation, 12f));
 
-                // Fetch suggestions and save them to Firebase
-                fetchAndSavePlaceSuggestions(city, trip.getKey(), "museum", "museums");
-                fetchAndSavePlaceSuggestions(city, trip.getKey(), "park", "parks");
-                fetchAndSavePlaceSuggestions(city, trip.getKey(), "restaurant", "restaurants");
-                fetchAndSavePlaceSuggestions(city, trip.getKey(), "gift_shop", "shops");
-                fetchAndSavePlaceSuggestions(city, trip.getKey(), "cafe", "cafes");
-                fetchAndSavePlaceSuggestions(city, trip.getKey(), "bar", "bars");
-                fetchAndSavePlaceSuggestions(city, trip.getKey(), "hotel", "hotels");
-                fetchAndSavePlaceSuggestions(city, trip.getKey(), "tourist_attraction", "attractions");
+                if (!suggestionsFetched) {
+                    // Fetch suggestions and save them to Firebase
+                    fetchAndSavePlaceSuggestions(city, trip.getKey(), "museum", "museums");
+                    fetchAndSavePlaceSuggestions(city, trip.getKey(), "park", "parks");
+                    fetchAndSavePlaceSuggestions(city, trip.getKey(), "restaurant", "restaurants");
+                    fetchAndSavePlaceSuggestions(city, trip.getKey(), "gift_shop", "shops");
+                    fetchAndSavePlaceSuggestions(city, trip.getKey(), "cafe", "cafes");
+                    fetchAndSavePlaceSuggestions(city, trip.getKey(), "bar", "bars");
+                    fetchAndSavePlaceSuggestions(city, trip.getKey(), "hotel", "hotels");
+                    fetchAndSavePlaceSuggestions(city, trip.getKey(), "tourist_attraction", "attractions");
+                    suggestionsFetched = true;
+                }
 
             } else {
                 Log.e(TAG, "Geocoding failed for city: " + city);
