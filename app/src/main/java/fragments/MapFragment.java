@@ -59,16 +59,14 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private DatabaseReference databaseRef;
     private Trip trip;
-    private List<Museum> museums = new ArrayList<>();
-    private boolean museumSuggestionsFetchedAndSaved = false;
-    private boolean attractionSuggestionsFetchedAndSaved = false;
     private PlacesClient placesClient;
+    private int museumsFetchedCount = 0;
+    private int parksFetchedCount = 0;
 
 
     @Nullable
@@ -145,12 +143,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-
         // Retrieve the last saved trip from Firebase
         getLastSavedTrip();
 
+        Log.d(TAG, "onMapReady: Last saved trip retrieved");
     }
-
     private void getLastSavedTrip() {
         // Get the current user's UID
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
@@ -201,32 +198,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 // Move the camera of the map to the city's location
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(cityLocation, 12f));
 
-                if (!museumSuggestionsFetchedAndSaved) {
-                    // Fetch museum suggestions and save them to Firebase
-                    fetchAndSaveMuseumSuggestions(city, trip.getKey());
-                }
-                if (!attractionSuggestionsFetchedAndSaved) {
-                    fetchAndSaveTouristAttractionSuggestions(city, trip.getKey());
-                }
+                // Fetch park suggestions and save them to Firebase
+                fetchAndSavePlaceSuggestions(city, trip.getKey(), "park", "parks");
+
+                // Fetch museum suggestions and save them to Firebase
+                fetchAndSavePlaceSuggestions(city, trip.getKey(), "museum", "museums");
+
+            } else {
+                Log.e(TAG, "Geocoding failed for city: " + city);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    // Inside your MapFragment class
-
-    // Add this method below your other methods in the class
-    private void fetchAndSaveMuseumSuggestions(String city, String tripKey) {
-        // Use Places API to fetch museum suggestions for the city
+    private void fetchAndSavePlaceSuggestions(String city, String tripKey, String placeType, String firebaseNode) {
+        // Use Places API to fetch place suggestions for the city
         String apiKey = getString(R.string.my_map_api_key);
         Places.initialize(requireContext(), apiKey);
         PlacesClient placesClient = Places.createClient(requireContext());
 
-        // Define the text query to search for museums in the city
-        String query = "museum in " + city;
+        // Define the text query to search for the place type in the city
+        String query = placeType + " in " + city;
 
-        // Create a request to fetch museum suggestions
+        // Create a request to fetch place suggestions
         FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
                 .setTypeFilter(TypeFilter.ESTABLISHMENT)
                 .setQuery(query)
@@ -239,19 +234,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         placesClient.findAutocompletePredictions(request)
                 .addOnSuccessListener((response) -> {
                     List<AutocompletePrediction> predictions = response.getAutocompletePredictions();
-                    Log.d(TAG, "Number of museum predictions: " + predictions.size()); // Log the number of predictions
+                    Log.d(TAG, "Number of " + placeType + " predictions: " + predictions.size()); // Log the number of predictions
                     int count = 0;
                     for (AutocompletePrediction prediction : predictions) {
-                        if (count >= 5) break; // Save up to 5 museum suggestions
-                        String museumName = prediction.getPrimaryText(null).toString();
-                        String museumAddress = prediction.getFullText(null).toString();
-                        Log.d(TAG, "Museum name: " + museumName); // Log each museum name
-                        Log.d(TAG, "Museum address: " + museumAddress); // Log each museum address
+                        if (count >= 5) break; // Save up to 5 place suggestions
+                        String placeName = prediction.getPrimaryText(null).toString();
+                        String placeAddress = prediction.getFullText(null).toString();
+                        Log.d(TAG, placeType + " name: " + placeName); // Log each place name
+                        Log.d(TAG, placeType + " address: " + placeAddress); // Log each place address
 
-                        // Perform geocoding for the museum's address to obtain coordinates
+                        // Perform geocoding for the place's address to obtain coordinates
                         Geocoder geocoder = new Geocoder(requireContext());
                         try {
-                            List<Address> addresses = geocoder.getFromLocationName(museumAddress, 1);
+                            List<Address> addresses = geocoder.getFromLocationName(placeAddress, 1);
                             if (!addresses.isEmpty()) {
                                 Address address = addresses.get(0);
                                 double latitude = address.getLatitude();
@@ -260,11 +255,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 // Get the placeId from prediction
                                 String placeId = prediction.getPlaceId();
 
-                                // Create a new Museum instance with placeId
-                                Museum museum = new Museum(museumName, city, museumAddress, latitude, longitude, placeId);
-                                saveMuseumToFirebase(museum, tripKey);
+                                // Create a new Place instance with placeId
+                                PlaceSuggestion placeSuggestion = new PlaceSuggestion(placeName, city, placeAddress, latitude, longitude, placeId);
+                                savePlaceSuggestionToFirebase(placeSuggestion, tripKey, firebaseNode);
+
+                                // Display marker for the place
+                                displayPlaceMarker(placeSuggestion);
+
                             } else {
-                                Log.e(TAG, "Geocoding failed for museum: " + museumName);
+                                Log.e(TAG, "Geocoding failed for " + placeType + ": " + placeName);
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -273,211 +272,60 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         count++;
                     }
 
-                    // Call displayMuseumMarkers after fetching and saving museum suggestions
-                    displayMuseumMarkers(tripKey);
+                    // Update the fetched count based on place type
+                    if (placeType.equals("museum")) {
+                        museumsFetchedCount++;
+                    } else if (placeType.equals("park")) {
+                        parksFetchedCount++;
+                    }
+
+                    // Check if both museums and parks fetch operations are completed
+                    if (museumsFetchedCount >= 5 && parksFetchedCount >= 5) {
+                        museumsFetchedCount = 0;
+                        parksFetchedCount = 0;
+                    }
+
                 })
                 .addOnFailureListener((exception) -> {
-                    Log.e(TAG, "Error fetching museum suggestions: " + exception.getMessage());
+                    Log.e(TAG, "Error fetching " + placeType + " suggestions: " + exception.getMessage());
                 });
 
-        museumSuggestionsFetchedAndSaved = true;
     }
 
-    private void fetchAndSaveTouristAttractionSuggestions(String city, String tripKey) {
-        // Use Places API to fetch tourist attraction suggestions for the city
-        String apiKey = getString(R.string.my_map_api_key);
-        Places.initialize(requireContext(), apiKey);
-        PlacesClient placesClient = Places.createClient(requireContext());
-
-        // Define the text query to search for tourist attractions in the city
-        String query = "tourist attractions in " + city;
-
-        // Create a request to fetch tourist attraction suggestions
-        FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
-                .setTypeFilter(TypeFilter.ESTABLISHMENT)
-                .setQuery(query)
-                .build();
-
-        // Get the current user's UID
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Perform the search asynchronously
-        placesClient.findAutocompletePredictions(request)
-                .addOnSuccessListener((response) -> {
-                    List<AutocompletePrediction> predictions = response.getAutocompletePredictions();
-                    Log.d(TAG, "Number of tourist attraction predictions: " + predictions.size()); // Log the number of predictions
-                    int count = 0;
-                    for (AutocompletePrediction prediction : predictions) {
-                        if (count >= 5) break; // Save up to 5 tourist attraction suggestions
-                        String attractionName = prediction.getPrimaryText(null).toString();
-                        String attractionAddress = prediction.getFullText(null).toString();
-                        Log.d(TAG, "Attraction name: " + attractionName); // Log each attraction name
-                        Log.d(TAG, "Attraction address: " + attractionAddress); // Log each attraction address
-
-                        // Perform geocoding for the attraction's address to obtain coordinates
-                        Geocoder geocoder = new Geocoder(requireContext());
-                        try {
-                            List<Address> addresses = geocoder.getFromLocationName(attractionAddress, 1);
-                            if (!addresses.isEmpty()) {
-                                Address address = addresses.get(0);
-                                double latitude = address.getLatitude();
-                                double longitude = address.getLongitude();
-
-                                // Get the placeId from prediction
-                                String placeId = prediction.getPlaceId();
-
-                                // Create a new TouristAttraction instance with placeId
-                                TouristAttraction attraction = new TouristAttraction(attractionName, city, attractionAddress, latitude, longitude, placeId);
-                                saveAttractionToFirebase(attraction, tripKey);
-                            } else {
-                                Log.e(TAG, "Geocoding failed for tourist attraction: " + attractionName);
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        count++;
-                    }
-
-                    // Call displayAttractionMarkers after fetching and saving tourist attraction suggestions
-                    displayAttractionMarkers(tripKey);
-                })
-                .addOnFailureListener((exception) -> {
-                    Log.e(TAG, "Error fetching tourist attraction suggestions: " + exception.getMessage());
-                });
-
-        attractionSuggestionsFetchedAndSaved = true;
-    }
-
-
-    // Add this method below your other methods in the class
-    private void saveMuseumToFirebase(Museum museum, String tripKey) {
+    private void savePlaceSuggestionToFirebase(PlaceSuggestion placeSuggestion, String tripKey, String firebaseNode) {
         // Get the current user's UID
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
         // Get a reference to the Firebase database
         DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
 
-        // Create a new node for the museum suggestion under the trip
-        DatabaseReference museumRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("museums").push();
+        // Create a new node for the place suggestion under the trip
+        DatabaseReference placeRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child(firebaseNode).push();
 
-        // Set the Museum object as the value for the database reference
-        museumRef.setValue(museum)
+        // Set the PlaceSuggestion object as the value for the database reference
+        placeRef.setValue(placeSuggestion)
                 .addOnSuccessListener((aVoid) -> {
-                    Log.d(TAG, "Museum suggestion saved to Firebase: " + museum.getName());
+                    Log.d(TAG, "Place suggestion saved to Firebase: " + placeSuggestion.getName());
                 })
                 .addOnFailureListener((e) -> {
-                    Log.e(TAG, "Error saving museum suggestion to Firebase: " + e.getMessage());
+                    Log.e(TAG, "Error saving place suggestion to Firebase: " + e.getMessage());
                 });
     }
 
-    private void saveAttractionToFirebase(TouristAttraction attraction, String tripKey) {
-        // Get the current user's UID
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    private void displayPlaceMarker(PlaceSuggestion placeSuggestion) {
+        // Get place details
+        String placeName = placeSuggestion.getName();
+        double latitude = placeSuggestion.getLatitude();
+        double longitude = placeSuggestion.getLongitude();
 
-        // Get a reference to the Firebase database
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+        // Add a marker on the map for the place
+        LatLng placeLocation = new LatLng(latitude, longitude);
+        Marker marker = mMap.addMarker(new MarkerOptions().position(placeLocation).title(placeName));
 
-        // Create a new node for the museum suggestion under the trip
-        DatabaseReference attractionRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("attraction").push();
-
-        // Set the Museum object as the value for the database reference
-        attractionRef.setValue(attraction)
-                .addOnSuccessListener((aVoid) -> {
-                    Log.d(TAG, "Atraction suggestion saved to Firebase: " + attraction.getName());
-                })
-                .addOnFailureListener((e) -> {
-                    Log.e(TAG, "Error saving attraction suggestion to Firebase: " + e.getMessage());
-                });
+        // Set the marker tag as the placeId associated with the place
+        marker.setTag(placeSuggestion.getPlaceId());
     }
 
-    private void displayMuseumMarkers(String tripKey) {
-        // Get the current user's UID
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Get a reference to the Firebase database
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-
-        // Get a reference to the museums node under the trip
-        DatabaseReference museumsRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("museums");
-
-
-        // Attach a ValueEventListener to retrieve the museums
-        museumsRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Iterate through each museum
-                for (DataSnapshot museumSnapshot : dataSnapshot.getChildren()) {
-                    // Create a Museum object from the snapshot
-                    Museum museum = museumSnapshot.getValue(Museum.class);
-                    if (museum != null) {
-                        // Get museum details
-                        String museumName = museum.getName();
-                        String museumAddress = museum.getAddress();
-                        double latitude = museum.getLatitude();
-                        double longitude = museum.getLongitude();
-
-                        // Add a marker on the map for the museum
-                        LatLng museumLocation = new LatLng(latitude, longitude);
-                        Marker marker = mMap.addMarker(new MarkerOptions().position(museumLocation).title(museumName));
-
-                        // Set the marker tag as the placeId associated with the museum
-                        marker.setTag(museum.getPlaceId());
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle database error
-                Log.e(TAG, "Error fetching museums from Firebase: " + databaseError.getMessage());
-            }
-        });
-    }
-
-    private void displayAttractionMarkers(String tripKey) {
-        // Get the current user's UID
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-
-        // Get a reference to the Firebase database
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-
-        // Get a reference to the museums node under the trip
-        DatabaseReference attractionRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("attraction");
-
-
-        // Attach a ValueEventListener to retrieve the museums
-        attractionRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                // Iterate through each museum
-                for (DataSnapshot attractionSnapshot : dataSnapshot.getChildren()) {
-                    // Create a TouristAttraction object from the snapshot
-                    TouristAttraction attraction = attractionSnapshot.getValue(TouristAttraction.class);
-                    if (attraction != null) {
-                        // Get attraction details
-                        String attractionName = attraction.getName();
-                        String attractionAddress = attraction.getAddress();
-                        double latitude = attraction.getLatitude();
-                        double longitude = attraction.getLongitude();
-
-                        // Add a marker on the map for the attraction
-                        LatLng attractionLocation = new LatLng(latitude, longitude);
-                        Marker marker = mMap.addMarker(new MarkerOptions().position(attractionLocation).title(attractionName));
-
-                        // Set the marker tag as the placeId associated with the attraction
-                        marker.setTag(attraction.getPlaceId());
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle database error
-                Log.e(TAG, "Error fetching attraction from Firebase: " + databaseError.getMessage());
-            }
-        });
-    }
 
     private void fetchPlaceDetails(String placeId) {
         // Define fields you want to retrieve
