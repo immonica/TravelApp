@@ -32,6 +32,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -270,7 +272,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                                 String placeId = prediction.getPlaceId();
 
                                 // Create a new Place instance with placeId
-                                PlaceSuggestion placeSuggestion = new PlaceSuggestion(placeName, city, placeAddress, latitude, longitude, placeId);
+                                PlaceSuggestion placeSuggestion = new PlaceSuggestion(placeName, city, placeAddress, latitude, longitude, placeId,placeType);
                                 savePlaceSuggestionToFirebase(placeSuggestion, tripKey, firebaseNode);
 
                                 // Display marker for the place
@@ -349,13 +351,44 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         String placeName = placeSuggestion.getName();
         double latitude = placeSuggestion.getLatitude();
         double longitude = placeSuggestion.getLongitude();
+        String placeType = placeSuggestion.getPlaceType();
+
+        // Determine marker icon based on place type
+        BitmapDescriptor markerIcon = getMarkerIcon(placeType);
 
         // Add a marker on the map for the place
         LatLng placeLocation = new LatLng(latitude, longitude);
-        Marker marker = mMap.addMarker(new MarkerOptions().position(placeLocation).title(placeName));
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(placeLocation)
+                .title(placeName)
+                .icon(markerIcon);
+        Marker marker = mMap.addMarker(markerOptions);
 
         // Set the marker tag as the placeId associated with the place
         marker.setTag(placeSuggestion.getPlaceId());
+    }
+
+    private BitmapDescriptor getMarkerIcon(String placeType) {
+        switch (placeType) {
+            case "museum":
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE);
+            case "park":
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+            case "restaurant":
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+            case "cafe":
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE);
+            case "hotel":
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
+            case "gift_shop":
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
+            case "tourist_attraction":
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE);
+            case "bar":
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN);
+            default:
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
+        }
     }
 
 

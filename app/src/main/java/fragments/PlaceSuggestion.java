@@ -7,19 +7,21 @@ public class PlaceSuggestion {
     private double latitude;
     private double longitude;
     private String placeId;
+    private String placeType;
 
     // Default constructor (no-argument constructor) required by Firebase
     public PlaceSuggestion() {
         // Default constructor required by Firebase
     }
 
-    public PlaceSuggestion(String name, String city, String address, double latitude, double longitude, String placeId) {
+    public PlaceSuggestion(String name, String city, String address, double latitude, double longitude, String placeId, String placeType) {
         this.name = name;
         this.city = city;
         this.address = address;
         this.latitude = latitude;
         this.longitude = longitude;
         this.placeId = placeId;
+        this.placeType = placeType;
     }
 
     public String getName() {
@@ -68,5 +70,13 @@ public class PlaceSuggestion {
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
+    }
+
+    public String getPlaceType() {
+        return placeType;
+    }
+
+    public void setPlaceType(String placeType) {
+        this.placeType = placeType;
     }
 }
