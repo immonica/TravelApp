@@ -814,10 +814,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         DatabaseReference itineraryRef = databaseRef.child("users").child(uid).child("trips").child(tripKey).child("itinerary").child(selectedDate).push();
 
         // Create a map to store place details
-        Map<String, String> placeDetails = new HashMap<>();
+        Map<String, Object> placeDetails = new HashMap<>();
         placeDetails.put("placeId", placeId);
         placeDetails.put("name", placeName);
         placeDetails.put("address", placeAddress);
+        placeDetails.put("visited", false); // Add visited field and set it to false initially
 
         // Save place details to the selected date in the itinerary
         itineraryRef.setValue(placeDetails)
@@ -828,6 +829,5 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     Log.e(TAG, "Error saving place to itinerary: " + e.getMessage());
                 });
     }
-
 
 }
