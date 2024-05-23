@@ -74,7 +74,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private int cafesFetchedCount = 0;
     private int hotelsFetchedCount = 0;
     private int giftShopsFetchedCount = 0;
-    private int touristAttractionsFetchedCount = 0;
     private int barsFetchedCount = 0;
     private boolean suggestionsFetched = false;
 
@@ -86,7 +85,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private List<Marker> giftShopMarkers = new ArrayList<>();
     private List<Marker> hotelMarkers = new ArrayList<>();
     private List<Marker> cafeMarkers = new ArrayList<>();
-    private List<Marker> touristAttractionMarkers = new ArrayList<>();
 
     @Nullable
     @Override
@@ -144,7 +142,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Button buttonCafe = view.findViewById(R.id.button_cafe);
         Button buttonHotel = view.findViewById(R.id.button_hotel);
         Button buttonGiftShop = view.findViewById(R.id.button_gift_shop);
-        Button buttonTouristAttraction = view.findViewById(R.id.button_tourist_attraction);
         Button buttonBar = view.findViewById(R.id.button_bar);
 
         // Set OnClickListener for museum button
@@ -198,15 +195,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 // Toggle gift shop markers
                 toggleMarkers("gift_shop");
-            }
-        });
-
-        // Set OnClickListener for tourist attraction button
-        buttonTouristAttraction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Toggle tourist attraction markers
-                toggleMarkers("tourist_attraction");
             }
         });
 
@@ -316,7 +304,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     fetchAndSavePlaceSuggestions(city, trip.getKey(), "cafe", "cafes");
                     fetchAndSavePlaceSuggestions(city, trip.getKey(), "bar", "bars");
                     fetchAndSavePlaceSuggestions(city, trip.getKey(), "hotel", "hotels");
-                    fetchAndSavePlaceSuggestions(city, trip.getKey(), "tourist_attraction", "attractions");
                     suggestionsFetched = true;
                 }
 
@@ -401,21 +388,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         hotelsFetchedCount++;
                     }else if (placeType.equals("gift_shop")) {
                         giftShopsFetchedCount++;
-                    }else if (placeType.equals("tourist_attraction")) {
-                        touristAttractionsFetchedCount++;
                     }else if (placeType.equals("bar")) {
                         barsFetchedCount++;
                     }
 
                     // Check if both museums and parks fetch operations are completed
-                    if (museumsFetchedCount >= 5 && parksFetchedCount >= 5 && restaurantsFetchedCount >= 5 && cafesFetchedCount >= 5 && hotelsFetchedCount >= 5 && giftShopsFetchedCount >= 5 && touristAttractionsFetchedCount >= 5 && barsFetchedCount >= 5) {
+                    if (museumsFetchedCount >= 5 && parksFetchedCount >= 5 && restaurantsFetchedCount >= 5 && cafesFetchedCount >= 5 && hotelsFetchedCount >= 5 && giftShopsFetchedCount >= 5  && barsFetchedCount >= 5) {
                         museumsFetchedCount = 0;
                         parksFetchedCount = 0;
                         restaurantsFetchedCount = 0;
                         cafesFetchedCount = 0;
                         hotelsFetchedCount = 0;
                         giftShopsFetchedCount = 0;
-                        touristAttractionsFetchedCount = 0;
                         barsFetchedCount = 0;
                     }
 
@@ -471,9 +455,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             case "gift_shop":
                 showMarkers(giftShopMarkers);
                 break;
-            case "tourist_attraction":
-                showMarkers(touristAttractionMarkers);
-                break;
             case "bar":
                 showMarkers(barMarkers);
                 break;
@@ -502,9 +483,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             marker.setVisible(false);
         }
         for (Marker marker : barMarkers) {
-            marker.setVisible(false);
-        }
-        for (Marker marker : touristAttractionMarkers) {
             marker.setVisible(false);
         }
         for (Marker marker : hotelMarkers) {
@@ -553,9 +531,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             case "gift_shop":
                 giftShopMarkers.add(marker);
                 break;
-            case "tourist_attraction":
-                touristAttractionMarkers.add(marker);
-                break;
             case "bar":
                 barMarkers.add(marker);
                 break;
@@ -596,7 +571,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         showMarkers(cafeMarkers);
         showMarkers(hotelMarkers);
         showMarkers(giftShopMarkers);
-        showMarkers(touristAttractionMarkers);
         showMarkers(barMarkers);
     }
 
