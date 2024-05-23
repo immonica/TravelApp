@@ -59,121 +59,132 @@
         android:layout_marginEnd="20dp"
         android:layout_marginTop="5dp" />
 
-
-    <!-- Text Boxes 1 -->
-    <TextView
-        android:id="@+id/museum_button"
+    <!-- Filter Buttons -->
+    <LinearLayout
+        android:id="@+id/filter_buttons_layout"
         android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:text="Museum"
-        android:gravity="center"
-        android:textColor="@color/grey"
-        android:background="@color/blue"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/attraction_button"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"/>
-
-    <TextView
-        android:id="@+id/attraction_button"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:text="Atraction"
-        android:gravity="center"
-        android:textColor="@color/grey"
-        android:background="@color/blue"
-        app:layout_constraintStart_toEndOf="@id/museum_button"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/park_button"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"/>
-
-    <TextView
-        android:id="@+id/park_button"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:text="Park"
-        android:gravity="center"
-        android:textColor="@color/grey"
-        android:background="@color/blue"
-        app:layout_constraintStart_toEndOf="@id/attraction_button"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/hotel_button"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"/>
-
-    <TextView
-        android:id="@+id/hotel_button"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:text="Hotel"
-        android:gravity="center"
-        android:textColor="@color/grey"
-        android:background="@color/blue"
-        app:layout_constraintStart_toEndOf="@id/park_button"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="16dp"/>
+        android:layout_marginTop="16dp">
 
-    <!-- Text Boxes 2 -->
-    <TextView
-        android:id="@+id/cafe_button"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:text="Cafe"
-        android:gravity="center"
-        android:textColor="@color/grey"
-        android:background="@color/blue"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/museum_button"
-        app:layout_constraintEnd_toStartOf="@id/bar_button"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"/>
+        <!-- First Row of Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
 
-    <TextView
-        android:id="@+id/bar_button"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:text="Bar"
-        android:gravity="center"
-        android:textColor="@color/grey"
-        android:background="@color/blue"
-        app:layout_constraintStart_toEndOf="@id/cafe_button"
-        app:layout_constraintTop_toBottomOf="@id/attraction_button"
-        app:layout_constraintEnd_toStartOf="@id/food_button"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"/>
+            <!-- Museum Button -->
+            <Button
+                android:id="@+id/button_museum"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Museum"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:singleLine="true" />
 
-    <TextView
-        android:id="@+id/food_button"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:text="Food"
-        android:gravity="center"
-        android:textColor="@color/grey"
-        android:background="@color/blue"
-        app:layout_constraintStart_toEndOf="@id/bar_button"
-        app:layout_constraintTop_toBottomOf="@id/park_button"
-        app:layout_constraintEnd_toStartOf="@id/shop_button"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"/>
+            <!-- Hotel Button -->
+            <Button
+                android:id="@+id/button_hotel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Hotel"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:singleLine="true" />
 
-    <TextView
-        android:id="@+id/shop_button"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:text="Shop"
-        android:gravity="center"
-        android:textColor="@color/grey"
-        android:background="@color/blue"
-        app:layout_constraintStart_toEndOf="@id/food_button"
-        app:layout_constraintTop_toBottomOf="@id/hotel_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="16dp"/>
+            <!-- Shop Button -->
+            <Button
+                android:id="@+id/button_gift_shop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Shop"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+            <!-- Park Button -->
+            <Button
+                android:id="@+id/button_park"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Park"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+        </LinearLayout>
+
+        <!-- Second Row of Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+
+            <!-- Restaurant Button -->
+            <Button
+                android:id="@+id/button_restaurant"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Restaurant"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+            <!-- Cafe Button -->
+            <Button
+                android:id="@+id/button_cafe"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Cafe"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+            <!-- Attraction Button -->
+            <Button
+                android:id="@+id/button_tourist_attraction"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Attraction"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+            <!-- Bar Button -->
+            <Button
+                android:id="@+id/button_bar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Bar"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                android:ellipsize="end"
+                android:singleLine="true" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

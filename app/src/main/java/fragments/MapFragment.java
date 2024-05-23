@@ -77,6 +77,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private int barsFetchedCount = 0;
     private boolean suggestionsFetched = false;
 
+    // Maintain lists of markers for each place type
+    private List<Marker> museumMarkers = new ArrayList<>();
+    private List<Marker> parkMarkers = new ArrayList<>();
+    private List<Marker> restaurantMarkers = new ArrayList<>();
+    private List<Marker> barMarkers = new ArrayList<>();
+    private List<Marker> giftShopMarkers = new ArrayList<>();
+    private List<Marker> hotelMarkers = new ArrayList<>();
+    private List<Marker> cafeMarkers = new ArrayList<>();
+    private List<Marker> touristAttractionMarkers = new ArrayList<>();
 
     @Nullable
     @Override
@@ -126,6 +135,89 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 fragmentTransaction.commit();
             }
         });
+
+        // Initialize buttons
+        Button buttonMuseum = view.findViewById(R.id.button_museum);
+        Button buttonPark = view.findViewById(R.id.button_park);
+        Button buttonRestaurant = view.findViewById(R.id.button_restaurant);
+        Button buttonCafe = view.findViewById(R.id.button_cafe);
+        Button buttonHotel = view.findViewById(R.id.button_hotel);
+        Button buttonGiftShop = view.findViewById(R.id.button_gift_shop);
+        Button buttonTouristAttraction = view.findViewById(R.id.button_tourist_attraction);
+        Button buttonBar = view.findViewById(R.id.button_bar);
+
+        // Set OnClickListener for museum button
+        buttonMuseum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle museum markers
+                toggleMarkers("museum");
+            }
+        });
+
+        // Set OnClickListener for park button
+        buttonPark.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle park markers
+                toggleMarkers("park");
+            }
+        });
+
+        // Set OnClickListener for restaurant button
+        buttonRestaurant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle restaurant markers
+                toggleMarkers("restaurant");
+            }
+        });
+
+        // Set OnClickListener for cafe button
+        buttonCafe.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle cafe markers
+                toggleMarkers("cafe");
+            }
+        });
+
+        // Set OnClickListener for hotel button
+        buttonHotel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle hotel markers
+                toggleMarkers("hotel");
+            }
+        });
+
+        // Set OnClickListener for gift shop button
+        buttonGiftShop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle gift shop markers
+                toggleMarkers("gift_shop");
+            }
+        });
+
+        // Set OnClickListener for tourist attraction button
+        buttonTouristAttraction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle tourist attraction markers
+                toggleMarkers("tourist_attraction");
+            }
+        });
+
+        // Set OnClickListener for bar button
+        buttonBar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle bar markers
+                toggleMarkers("bar");
+            }
+        });
+
 
 
         return view;
@@ -346,6 +438,75 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 });
     }
 
+    // Toggle visibility of markers based on place type
+    private void toggleMarkers(String placeType) {
+        // Hide all markers first
+        hideAllMarkers();
+
+        // Show markers for the selected place type
+        switch (placeType) {
+            case "museum":
+                showMarkers(museumMarkers);
+                break;
+            case "park":
+                showMarkers(parkMarkers);
+                break;
+            case "restaurant":
+                showMarkers(restaurantMarkers);
+                break;
+            case "cafe":
+                showMarkers(cafeMarkers);
+                break;
+            case "hotel":
+                showMarkers(hotelMarkers);
+                break;
+            case "gift_shop":
+                showMarkers(giftShopMarkers);
+                break;
+            case "tourist_attraction":
+                showMarkers(touristAttractionMarkers);
+                break;
+            case "bar":
+                showMarkers(barMarkers);
+                break;
+        }
+    }
+
+    // Helper method to show markers for a specific place type
+    private void showMarkers(List<Marker> markers) {
+        for (Marker marker : markers) {
+            marker.setVisible(true);
+        }
+    }
+
+    // Helper method to hide all markers
+    private void hideAllMarkers() {
+        for (Marker marker : museumMarkers) {
+            marker.setVisible(false);
+        }
+        for (Marker marker : parkMarkers) {
+            marker.setVisible(false);
+        }
+        for (Marker marker : restaurantMarkers) {
+            marker.setVisible(false);
+        }
+        for (Marker marker : cafeMarkers) {
+            marker.setVisible(false);
+        }
+        for (Marker marker : barMarkers) {
+            marker.setVisible(false);
+        }
+        for (Marker marker : touristAttractionMarkers) {
+            marker.setVisible(false);
+        }
+        for (Marker marker : hotelMarkers) {
+            marker.setVisible(false);
+        }
+        for (Marker marker : giftShopMarkers) {
+            marker.setVisible(false);
+        }
+    }
+
     private void displayPlaceMarker(PlaceSuggestion placeSuggestion) {
         // Get place details
         String placeName = placeSuggestion.getName();
@@ -363,6 +524,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .title(placeName)
                 .icon(markerIcon);
         Marker marker = mMap.addMarker(markerOptions);
+
+        // Add the marker to the appropriate list based on place type
+        switch (placeSuggestion.getPlaceType()) {
+            case "museum":
+                museumMarkers.add(marker);
+                break;
+            case "park":
+                parkMarkers.add(marker);
+                break;
+            case "restaurant":
+                restaurantMarkers.add(marker);
+                break;
+            case "cafe":
+                cafeMarkers.add(marker);
+                break;
+            case "hotel":
+                hotelMarkers.add(marker);
+                break;
+            case "gift_shop":
+                giftShopMarkers.add(marker);
+                break;
+            case "tourist_attraction":
+                touristAttractionMarkers.add(marker);
+                break;
+            case "bar":
+                barMarkers.add(marker);
+                break;
+        }
 
         // Set the marker tag as the placeId associated with the place
         marker.setTag(placeSuggestion.getPlaceId());
