@@ -48,6 +48,34 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="5dp" />
 
+    <!-- Clear Filters Button -->
+    <LinearLayout
+        android:id="@+id/clear_filters_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:background="@drawable/ripple_effect"
+        app:layout_constraintTop_toTopOf="@id/navigation_bar"
+        app:layout_constraintStart_toStartOf="@id/navigation_bar"
+        app:layout_constraintEnd_toEndOf="@id/navigation_bar"
+        android:gravity="center">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/baseline_filter_list_off_24"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clear Filters"
+            android:textColor="@color/blue"
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
     <!-- List Icon -->
     <ImageView
         android:id="@+id/list_icon"
@@ -59,6 +87,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginTop="5dp" />
 
+
     <!-- Filter Buttons -->
     <LinearLayout
         android:id="@+id/filter_buttons_layout"
@@ -68,14 +97,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp">
+        android:layout_marginTop="5dp">
 
         <!-- First Row of Buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="5dp">
 
             <!-- Museum Button -->
             <Button
@@ -84,8 +113,8 @@
                 android:layout_height="wrap_content"
                 android:text="Museum"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:ellipsize="end"
                 android:singleLine="true" />
 
@@ -96,8 +125,8 @@
                 android:layout_height="wrap_content"
                 android:text="Hotel"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:ellipsize="end"
                 android:singleLine="true" />
 
@@ -108,8 +137,8 @@
                 android:layout_height="wrap_content"
                 android:text="Shop"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:ellipsize="end"
                 android:singleLine="true" />
 
@@ -120,8 +149,8 @@
                 android:layout_height="wrap_content"
                 android:text="Park"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:ellipsize="end"
                 android:singleLine="true" />
 
@@ -132,7 +161,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="5dp">
 
             <!-- Restaurant Button -->
             <Button
@@ -141,8 +170,8 @@
                 android:layout_height="wrap_content"
                 android:text="Restaurant"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:ellipsize="end"
                 android:singleLine="true" />
 
@@ -153,8 +182,8 @@
                 android:layout_height="wrap_content"
                 android:text="Cafe"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:ellipsize="end"
                 android:singleLine="true" />
 
@@ -165,8 +194,8 @@
                 android:layout_height="wrap_content"
                 android:text="Attraction"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:ellipsize="end"
                 android:singleLine="true" />
 
@@ -177,8 +206,8 @@
                 android:layout_height="wrap_content"
                 android:text="Bar"
                 android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginEnd="5dp"
                 android:ellipsize="end"
                 android:singleLine="true" />
 

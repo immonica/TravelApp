@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -218,7 +219,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-
+        // Find the "Clear Filters" button by its ID
+        LinearLayout clearFiltersButton = view.findViewById(R.id.clear_filters_button);
+        clearFiltersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clearAllFilters();
+            }
+        });
 
         return view;
     }
@@ -578,6 +586,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             default:
                 return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
         }
+    }
+
+    private void clearAllFilters() {
+        // Show all markers
+        showMarkers(museumMarkers);
+        showMarkers(parkMarkers);
+        showMarkers(restaurantMarkers);
+        showMarkers(cafeMarkers);
+        showMarkers(hotelMarkers);
+        showMarkers(giftShopMarkers);
+        showMarkers(touristAttractionMarkers);
+        showMarkers(barMarkers);
     }
 
 
