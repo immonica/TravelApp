@@ -118,6 +118,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     }
 
     private static final String TAG = "HomeFragment";
+    private String city;
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COURSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
@@ -160,6 +161,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
                 // Extract the name of the selected place
                 String placeName = place.getName();
+                // Perform reverse geocoding to get the city
+                Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
+                try {
+                    List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                    if (!addresses.isEmpty()) {
+                        city = addresses.get(0).getLocality(); // Assign value to city variable
+                    } else {
+                        Log.e(TAG, "No address found for the location");
+                        Toast.makeText(getContext(), "No address found for the location", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    Log.e(TAG, "Geocoding failed: " + e.getMessage());
+                    Toast.makeText(getContext(), "Geocoding failed", Toast.LENGTH_SHORT).show();
+                }
 
                 // Perform a text search using the name of the selected place
                 performTextSearch(placeName);
@@ -475,7 +490,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     // Save the place to favorites
-                    saveToFavorites(place);
+                    saveToFavorites(place, city, place.getId());
                 } else {
                     // Remove the place from favorites
                     removeFromFavorites(place.getId());
@@ -564,7 +579,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     }
 
     // Save the place to favorites in Firebase
-    private void saveToFavorites(Place place) {
+    private void saveToFavorites(Place place, String city, String placeId) {
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference favRef = FirebaseDatabase.getInstance().getReference()
                 .child("users").child(uid).child("favorites").push(); // Generate a unique key for the favorite
@@ -574,8 +589,11 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         Map<String, Object> favoriteData = new HashMap<>();
         favoriteData.put("name", place.getName());
         favoriteData.put("address", place.getAddress());
+        favoriteData.put("city", city); // Save city along with other favorite data
         favoriteData.put("latLng", place.getLatLng().latitude + "," + place.getLatLng().longitude);
+        favoriteData.put("placeType", "favorite"); // Assuming "favorite" is the place type
         favoriteData.put("key", key); // Set the key in the favorite data
+        favoriteData.put("placeId", placeId); // Include the placeId
 
         favRef.setValue(favoriteData)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {

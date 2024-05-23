@@ -85,6 +85,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private List<Marker> giftShopMarkers = new ArrayList<>();
     private List<Marker> hotelMarkers = new ArrayList<>();
     private List<Marker> cafeMarkers = new ArrayList<>();
+    private List<Marker> favoriteMarkers = new ArrayList<>();
 
     @Nullable
     @Override
@@ -143,6 +144,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         Button buttonHotel = view.findViewById(R.id.button_hotel);
         Button buttonGiftShop = view.findViewById(R.id.button_gift_shop);
         Button buttonBar = view.findViewById(R.id.button_bar);
+        Button buttonFavorite = view.findViewById(R.id.button_favorite);
 
         // Set OnClickListener for museum button
         buttonMuseum.setOnClickListener(new View.OnClickListener() {
@@ -204,6 +206,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             public void onClick(View v) {
                 // Toggle bar markers
                 toggleMarkers("bar");
+            }
+        });
+
+        buttonFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Toggle bar markers
+                toggleMarkers("favorite");
             }
         });
 
@@ -304,6 +314,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     fetchAndSavePlaceSuggestions(city, trip.getKey(), "cafe", "cafes");
                     fetchAndSavePlaceSuggestions(city, trip.getKey(), "bar", "bars");
                     fetchAndSavePlaceSuggestions(city, trip.getKey(), "hotel", "hotels");
+                    // Fetch and display favorite places
+                    fetchAndDisplayFavorites(trip.getKey(), "favorites");
                     suggestionsFetched = true;
                 }
 
@@ -458,6 +470,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             case "bar":
                 showMarkers(barMarkers);
                 break;
+            case "favorite":
+                showMarkers(favoriteMarkers);
+                break;
         }
     }
 
@@ -491,9 +506,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         for (Marker marker : giftShopMarkers) {
             marker.setVisible(false);
         }
+        for (Marker marker : favoriteMarkers) {
+            marker.setVisible(false);
+        }
     }
 
-    private void displayPlaceMarker(PlaceSuggestion placeSuggestion) {
+    private Marker displayPlaceMarker(PlaceSuggestion placeSuggestion) {
         // Get place details
         String placeName = placeSuggestion.getName();
         double latitude = placeSuggestion.getLatitude();
@@ -538,7 +556,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // Set the marker tag as the placeId associated with the place
         marker.setTag(placeSuggestion.getPlaceId());
+
+        // Return the created marker
+        return marker;
     }
+
 
     private BitmapDescriptor getMarkerIcon(String placeType) {
         switch (placeType) {
@@ -554,10 +576,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW);
             case "gift_shop":
                 return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET);
-            case "tourist_attraction":
-                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE);
             case "bar":
                 return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN);
+            case "favorite":
+                return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ROSE);
             default:
                 return BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE);
         }
@@ -572,6 +594,62 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         showMarkers(hotelMarkers);
         showMarkers(giftShopMarkers);
         showMarkers(barMarkers);
+        showMarkers(favoriteMarkers);
+    }
+
+    private void fetchAndDisplayFavorites(String tripKey, String firebaseNode) {
+        // Get the current user's UID
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // Reference to the user's favorites node
+        DatabaseReference favoritesRef = FirebaseDatabase.getInstance().getReference().child("users").child(uid).child("favorites");
+
+        // Retrieve the favorites data asynchronously
+        favoritesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                for (DataSnapshot favoriteSnapshot : dataSnapshot.getChildren()) {
+                    Favorite favorite = favoriteSnapshot.getValue(Favorite.class);
+                    if (favorite != null) {
+                        // Set the key of the favorite
+                        favorite.setKey(favoriteSnapshot.getKey());
+
+                        // Set the placeId of the favorite (assuming it's stored under a "placeId" field in Firebase)
+                        String placeId = favoriteSnapshot.child("placeId").getValue(String.class);
+                        favorite.setPlaceId(placeId);
+
+                        // Display the favorite marker
+                        displayFavoriteMarker(favorite);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle database error
+            }
+        });
+    }
+
+
+    private void displayFavoriteMarker(Favorite favorite) {
+        // Get favorite details
+        String placeName = favorite.getName();
+        double latitude = Double.parseDouble(favorite.getLatLng().split(",")[0]);
+        double longitude = Double.parseDouble(favorite.getLatLng().split(",")[1]);
+        String placeType = favorite.getPlaceType();
+        String placeId = favorite.getPlaceId(); // Retrieve placeId from Favorite object
+
+        // Create a PlaceSuggestion instance for the favorite
+        PlaceSuggestion favoritePlace = new PlaceSuggestion(placeName, favorite.getCity(), favorite.getAddress(), latitude, longitude, placeType, placeId); // Pass placeId to the constructor
+
+        // Display the favorite marker using the unified method
+        Marker favoriteMarker = displayPlaceMarker(favoritePlace);
+
+        // Set the placeId as the tag for the favorite marker
+        if (favoriteMarker != null) {
+            favoriteMarker.setTag(placeId);
+        }
     }
 
 
