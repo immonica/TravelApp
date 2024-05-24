@@ -133,16 +133,27 @@ public class PopUpFragment extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     tripContainer.removeAllViews();
                     long totalTrips = dataSnapshot.getChildrenCount();
-                    long start = Math.max(0, totalTrips - 5);
-                    long index = 0;
-                    for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
-                        if (index >= start) {
-                            Trip trip = tripSnapshot.getValue(Trip.class);
-                            if (trip != null) {
-                                addTripView(trip);
+                    if (totalTrips == 0) {
+                        // If no trips, display a message
+                        TextView noTripsTextView = new TextView(requireContext());
+                        noTripsTextView.setText("No trips created yet");
+                        noTripsTextView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
+                        noTripsTextView.setTextSize(18);
+                        noTripsTextView.setPadding(16, 16, 16, 16);
+
+                        tripContainer.addView(noTripsTextView);
+                    } else {
+                        long start = Math.max(0, totalTrips - 5);
+                        long index = 0;
+                        for (DataSnapshot tripSnapshot : dataSnapshot.getChildren()) {
+                            if (index >= start) {
+                                Trip trip = tripSnapshot.getValue(Trip.class);
+                                if (trip != null) {
+                                    addTripView(trip);
+                                }
                             }
+                            index++;
                         }
-                        index++;
                     }
                 }
 
@@ -155,7 +166,6 @@ public class PopUpFragment extends Fragment {
             tripsRef.addValueEventListener(valueEventListener);
         }
     }
-
 
     private void addTripView(Trip trip) {
         // Inflate the trip_item layout
@@ -370,7 +380,5 @@ public class PopUpFragment extends Fragment {
             }
         }
     }
-
-
 
 }

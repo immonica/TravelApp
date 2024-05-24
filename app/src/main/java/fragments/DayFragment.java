@@ -271,4 +271,10 @@ public class DayFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        sortAndRefreshViews((LinearLayout) getView().findViewById(R.id.day_content_layout), LayoutInflater.from(requireContext()));
+    }
+
 }

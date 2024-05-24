@@ -669,42 +669,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         });
     }
 
-
-   /* private void init() {
-        Log.d(TAG, "init: initializing");
-
-        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
-                if (actionId == EditorInfo.IME_ACTION_SEARCH
-                        || actionId == EditorInfo.IME_ACTION_DONE
-                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
-                        || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
-
-                    // Execute our method for searching
-                    geoLocate();
-
-                    return true; // Consume the event
-                }
-
-                return false; // Don't consume the event
-            }
-        });*/
-
-    /*mGps.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            Log.d(TAG, "onClick: clicked gps icon");
-            getDeviceLocation();
-        }
-    });
-     */
-
-    //hideSoftKeyboard();
-    // }
-
-
-
     private void getDeviceLocation(){
         Log.d(TAG, "getDeviceLocation: getting the devices current location");
 

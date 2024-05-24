@@ -80,23 +80,5 @@ public class MainActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
-    // Method to handle navigation from LoginFragment to HomeFragment
-    public void navigateToHomeFragment() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, new HomeFragment())
-                .commit();
-    }
-
-
-    // Method to handle navigation from HomeFragment to PopUpFragment
-    public void navigateToPopUpFragment() {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragmentContainer, new PopUpFragment())
-                .addToBackStack(null)
-                .commit();
-    }
-
-
-
 
 }
