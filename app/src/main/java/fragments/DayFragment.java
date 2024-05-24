@@ -43,6 +43,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -111,6 +113,8 @@ public class DayFragment extends Fragment {
                     visitCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                         place.put("visited", isChecked);
                         updateVisitedStatus(currentUser.getUid(), tripKey, day, place);
+                        // After updating the visited status, re-sort and update the views
+                        sortAndRefreshViews(dayContentLayout, layoutInflater);
                     });
                     // Fetch and set photo for the place
                     fetchPlacePhoto(placeName, imageView);
@@ -143,6 +147,40 @@ public class DayFragment extends Fragment {
                     });
         } else {
             Log.e(TAG, "TripRef is null");
+        }
+    }
+
+    private void sortAndRefreshViews(LinearLayout dayContentLayout, LayoutInflater layoutInflater) {
+        List<View> placeViews = new ArrayList<>();
+        for (int i = 0; i < dayContentLayout.getChildCount(); i++) {
+            placeViews.add(dayContentLayout.getChildAt(i));
+        }
+
+        // Sort the views based on visited state
+        Collections.sort(placeViews, new Comparator<View>() {
+            @Override
+            public int compare(View view1, View view2) {
+                CheckBox visitCheckBox1 = view1.findViewById(R.id.visit_checkbox);
+                CheckBox visitCheckBox2 = view2.findViewById(R.id.visit_checkbox);
+                boolean visited1 = visitCheckBox1.isChecked();
+                boolean visited2 = visitCheckBox2.isChecked();
+                // Places with visited state false come first
+                if (!visited1 && visited2) {
+                    return -1;
+                } else if (visited1 && !visited2) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            }
+        });
+
+        // Remove all views from the layout
+        dayContentLayout.removeAllViews();
+
+        // Add views back to the layout in the sorted order
+        for (View view : placeViews) {
+            dayContentLayout.addView(view);
         }
     }
 
