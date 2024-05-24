@@ -104,7 +104,7 @@ public class DayFragment extends Fragment {
                     TextView itineraryTextView = itineraryView.findViewById(R.id.itinerary_text_view);
                     ImageView imageView = itineraryView.findViewById(R.id.place_itinerary_image_view);
                     CheckBox visitCheckBox = itineraryView.findViewById(R.id.visit_checkbox);
-                    //Button removeButton = itineraryView.findViewById(R.id.remove_itinerary_button);
+                    Button removeButton = itineraryView.findViewById(R.id.remove_itinerary_button);
 
                     String placeName = (String) place.get("name");
                     itineraryTextView.setText(placeName);
@@ -118,6 +118,22 @@ public class DayFragment extends Fragment {
                     });
                     // Fetch and set photo for the place
                     fetchPlacePhoto(placeName, imageView);
+
+                    // Set click listener for the remove button
+                    removeButton.setOnClickListener(v -> {
+                        // Display a confirmation dialog
+                        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+                        builder.setTitle("Confirm");
+                        builder.setMessage("Are you sure you want to remove this place from the itinerary?");
+                        builder.setPositiveButton("Yes", (dialog, which) -> {
+                            // Remove the place from the itinerary list
+                            removePlaceFromItinerary(dayContentLayout, itineraryView, place);
+                        });
+                        builder.setNegativeButton("No", (dialog, which) -> {
+                            // Do nothing
+                        });
+                        builder.show();
+                    });
 
                     dayContentLayout.addView(itineraryView);
                     Log.d(TAG, "Place Name: " + place.get("name"));
@@ -183,6 +199,29 @@ public class DayFragment extends Fragment {
             dayContentLayout.addView(view);
         }
     }
+
+    private void removePlaceFromItinerary(LinearLayout dayContentLayout, View itineraryView, Map<String, Object> place) {
+        // Remove the place view from the layout
+        dayContentLayout.removeView(itineraryView);
+
+        // Remove the place from the itinerary list
+        String placeKey = (String) place.get("key");
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference placeRef = FirebaseDatabase.getInstance().getReference()
+                    .child("users").child(currentUser.getUid()).child("trips")
+                    .child(tripKey).child("itinerary").child(getArguments().getString(ARG_DAY)).child(placeKey);
+            placeRef.removeValue()
+                    .addOnSuccessListener(aVoid -> {
+                        Toast.makeText(requireContext(), "Place removed from itinerary", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error removing place from itinerary: " + e.getMessage());
+                        Toast.makeText(requireContext(), "Failed to remove place from itinerary", Toast.LENGTH_SHORT).show();
+                    });
+        }
+    }
+
 
     private void fetchPlacePhoto(String cityName, ImageView imageView) {
         // Create a FindAutocompletePredictionsRequest for the city name
