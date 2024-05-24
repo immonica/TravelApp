@@ -66,41 +66,28 @@ public class PlannerFragment extends Fragment {
     }
 
     private void retrieveTripData() {
-        // Get the current user's UID
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             String uid = currentUser.getUid();
 
-            // Get a reference to the trips node for the current user
             DatabaseReference tripRef = FirebaseDatabase.getInstance().getReference()
                     .child("users").child(uid).child("trips");
 
-            // Query to get the last trip added for the user
             Query lastTripQuery = tripRef.orderByKey().limitToLast(1);
 
-            // Attach a ValueEventListener to retrieve the last trip data
             lastTripQuery.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    // Check if there is any trip data
                     if (snapshot.exists()) {
-                        // Retrieve the last trip data
                         DataSnapshot lastTripSnapshot = snapshot.getChildren().iterator().next();
+                        String tripKey = lastTripSnapshot.getKey(); // Get the tripKey here
                         String city = lastTripSnapshot.child("city").getValue(String.class);
                         String startDate = lastTripSnapshot.child("startDate").getValue(String.class);
                         String endDate = lastTripSnapshot.child("endDate").getValue(String.class);
                         List<String> days = lastTripSnapshot.child("days").getValue(new GenericTypeIndicator<List<String>>() {});
 
-                        // Log retrieved trip data
-                        Log.d("PlannerFragment", "City: " + city);
-                        Log.d("PlannerFragment", "StartDate: " + startDate);
-                        Log.d("PlannerFragment", "EndDate: " + endDate);
-                        Log.d("PlannerFragment", "Days: " + days);
-
-                        // Check if the days list is not null
                         if (days != null) {
-                            // Retrieve itinerary data for each day
-                            Map<String, List<String>> itineraryMap = new HashMap<>();
+                            Map<String, List<Map<String, Object>>> itineraryMap = new HashMap<>();
                             DataSnapshot itinerarySnapshot = lastTripSnapshot.child("itinerary");
 
                             for (DataSnapshot yearSnapshot : itinerarySnapshot.getChildren()) {
@@ -111,58 +98,49 @@ public class PlannerFragment extends Fragment {
                                         String day = daySnapshot.getKey();
                                         String date = day + "/" + month + "/" + year;
 
-                                        List<String> places = new ArrayList<>();
+                                        List<Map<String, Object>> places = new ArrayList<>();
                                         for (DataSnapshot placeSnapshot : daySnapshot.getChildren()) {
-                                            // Skip processing if the child is "day", "month", or "year"
                                             if (placeSnapshot.getKey().equals("day") || placeSnapshot.getKey().equals("month") || placeSnapshot.getKey().equals("year")) {
                                                 continue;
                                             }
 
-                                            String placeName = placeSnapshot.child("name").getValue(String.class);
-                                            if (placeName != null) {
-                                                places.add(placeName);
-                                            }
+                                            Map<String, Object> placeDetails = new HashMap<>();
+                                            placeDetails.put("name", placeSnapshot.child("name").getValue(String.class));
+                                            placeDetails.put("visited", placeSnapshot.child("visited").getValue(Boolean.class));
+                                            placeDetails.put("placeId", placeSnapshot.child("placeId").getValue(String.class));
+                                            placeDetails.put("address", placeSnapshot.child("address").getValue(String.class));
+                                            placeDetails.put("key", placeSnapshot.getKey()); // Add place key
+
+                                            places.add(placeDetails);
                                         }
                                         itineraryMap.put(date, places);
-                                        Log.d("PlannerFragment", "Date: " + date + ", Places: " + places);
                                     }
                                 }
                             }
-
-                            // Set up ViewPager2 and TabLayout with retrieved trip data and itinerary data
-                            setUpViewPagerAndTabLayout(city, startDate, endDate, days, itineraryMap);
+                            setUpViewPagerAndTabLayout(city, startDate, endDate, days, itineraryMap, tripKey); // Pass tripKey here
                         } else {
-                            // Handle case where days list is null
                             Log.e("PlannerFragment", "Days list is null for trip with city: " + city);
                         }
                     } else {
-                        // Log that no trip data was found
                         Log.d("PlannerFragment", "No trip data found.");
                     }
                 }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-                    // Handle database error
                     Log.e("FirebaseError", "Database error: " + error.getMessage());
                 }
             });
         } else {
-            // Log that the user is not authenticated
             Log.d("PlannerFragment", "User not authenticated.");
         }
     }
 
-    private void setUpViewPagerAndTabLayout(String city, String startDate, String endDate, List<String> days, Map<String, List<String>> itineraryMap) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(requireActivity(), days, itineraryMap);
+    private void setUpViewPagerAndTabLayout(String city, String startDate, String endDate, List<String> days, Map<String, List<Map<String, Object>>> itineraryMap, String tripKey) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(requireActivity(), days, itineraryMap, tripKey);
         viewPager.setAdapter(adapter);
 
-        new TabLayoutMediator(tabLayout, viewPager, new TabLayoutMediator.TabConfigurationStrategy() {
-            @Override
-            public void onConfigureTab(@NonNull TabLayout.Tab tab, int position) {
-                tab.setText(days.get(position));
-            }
-        }).attach();
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> tab.setText(days.get(position))).attach();
     }
 
     private void onDeleteButtonClick() {
@@ -175,23 +153,24 @@ public class PlannerFragment extends Fragment {
     // ViewPager2 Adapter
     private static class ViewPagerAdapter extends FragmentStateAdapter {
         private List<String> days;
-        private Map<String, List<String>> itineraryMap;
+        private Map<String, List<Map<String, Object>>> itineraryMap;
+        private String tripKey; // Add this line
 
-        public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, List<String> days, Map<String, List<String>> itineraryMap) {
+        public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, List<String> days, Map<String, List<Map<String, Object>>> itineraryMap, String tripKey) {
             super(fragmentActivity);
             this.days = days;
             this.itineraryMap = itineraryMap;
+            this.tripKey = tripKey; // Add this line
         }
 
         @NonNull
         @Override
         public Fragment createFragment(int position) {
             String day = days.get(position);
-            // Convert day to the format year/month/day to match itineraryMap keys
             String[] dateParts = day.split("/");
             String formattedDate = dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
-            List<String> itinerary = itineraryMap.get(formattedDate);
-            return DayFragment.newInstance(day, itinerary != null ? itinerary : new ArrayList<>());
+            List<Map<String, Object>> itinerary = itineraryMap.get(formattedDate);
+            return DayFragment.newInstance(day, itinerary != null ? itinerary : new ArrayList<>(), tripKey); // Add tripKey here
         }
 
         @Override

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -39,22 +40,27 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class DayFragment extends Fragment {
 
     private static final String ARG_DAY = "day";
     private static final String ARG_ITINERARY = "itinerary";
+    private static final String ARG_TRIP_KEY = "trip_key";
     private PlacesClient placesClient;
     private DatabaseReference tripRef;
+    private String tripKey;
 
-    public static DayFragment newInstance(String day, List<String> itinerary) {
+    public static DayFragment newInstance(String day, List<Map<String, Object>> itinerary, String tripKey) {
         DayFragment fragment = new DayFragment();
         Bundle args = new Bundle();
         args.putString(ARG_DAY, day);
-        args.putStringArrayList(ARG_ITINERARY, new ArrayList<>(itinerary != null ? itinerary : new ArrayList<>()));
+        args.putSerializable(ARG_ITINERARY, (Serializable) itinerary);
+        args.putString(ARG_TRIP_KEY, tripKey);
         fragment.setArguments(args);
         return fragment;
     }
@@ -76,33 +82,68 @@ public class DayFragment extends Fragment {
 
         if (getArguments() != null) {
             String day = getArguments().getString(ARG_DAY);
-            List<String> itinerary = getArguments().getStringArrayList(ARG_ITINERARY);
+            List<Map<String, Object>> itinerary = (List<Map<String, Object>>) getArguments().getSerializable(ARG_ITINERARY);
+            tripKey = getArguments().getString(ARG_TRIP_KEY);
 
             LinearLayout dayContentLayout = view.findViewById(R.id.day_content_layout);
             dayContentLayout.removeAllViews();
 
+            Log.d(TAG, "Day: " + day);
             if (itinerary == null || itinerary.isEmpty()) {
+                Log.d(TAG, "No itinerary data for this day.");
                 TextView noLocationsTextView = new TextView(getContext());
                 noLocationsTextView.setText("No locations for this day saved");
                 dayContentLayout.addView(noLocationsTextView);
             } else {
+                Log.d(TAG, "Itinerary data found for this day.");
                 LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-                for (String place : itinerary) {
+                for (Map<String, Object> place : itinerary) {
                     View itineraryView = layoutInflater.inflate(R.layout.itinerary_layout, dayContentLayout, false);
                     TextView itineraryTextView = itineraryView.findViewById(R.id.itinerary_text_view);
                     ImageView imageView = itineraryView.findViewById(R.id.place_itinerary_image_view);
+                    CheckBox visitCheckBox = itineraryView.findViewById(R.id.visit_checkbox);
                     //Button removeButton = itineraryView.findViewById(R.id.remove_itinerary_button);
 
-                    itineraryTextView.setText(place);
+                    String placeName = (String) place.get("name");
+                    itineraryTextView.setText(placeName);
+                    visitCheckBox.setChecked((Boolean) place.get("visited"));
+
+                    visitCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                        place.put("visited", isChecked);
+                        updateVisitedStatus(currentUser.getUid(), tripKey, day, place);
+                    });
                     // Fetch and set photo for the place
-                    fetchPlacePhoto(place, imageView);
+                    fetchPlacePhoto(placeName, imageView);
 
                     dayContentLayout.addView(itineraryView);
+                    Log.d(TAG, "Place Name: " + place.get("name"));
                 }
             }
         }
 
         return view;
+    }
+    private void updateVisitedStatus(String uid, String tripKey, String day, Map<String, Object> place) {
+        if (tripRef != null) {
+            boolean visited = (Boolean) place.get("visited");
+            Log.d(TAG, "Updating visited status for place in trip: " + tripKey + ", Day: " + day + ", Visited: " + visited);
+
+            // Construct the reference path using uid, tripKey (key), day, and placeId
+            DatabaseReference placeRef = tripRef.child(tripKey)
+                    .child("itinerary")
+                    .child(day)
+                    .child((String) place.get("key")) // Assuming place key is stored in the map
+                    .child("visited");
+            placeRef.setValue(visited)
+                    .addOnSuccessListener(aVoid -> {
+                        Log.d(TAG, "Visited status updated successfully for place in trip: " + tripKey);
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "Error updating visited status for place in trip: " + tripKey + ", Error: " + e.getMessage());
+                    });
+        } else {
+            Log.e(TAG, "TripRef is null");
+        }
     }
 
     private void fetchPlacePhoto(String cityName, ImageView imageView) {
