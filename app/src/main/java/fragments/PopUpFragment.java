@@ -2,7 +2,9 @@ package fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -296,6 +298,13 @@ public class PopUpFragment extends Fragment {
             }
         });
 
+        favoriteView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showConfirmationDialog(favorite.getName());
+            }
+        });
+
         favoriteContainer.addView(favoriteView);
     }
 
@@ -337,6 +346,39 @@ public class PopUpFragment extends Fragment {
         dialog.show();
     }
 
+    private void showConfirmationDialog(String locationName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Open in Google Maps");
+        builder.setMessage("Are you sure you want to open directions to " + locationName + " in Google Maps?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // User clicked Yes, proceed with opening Google Maps
+                openGoogleMaps(locationName);
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // User clicked No, dismiss the dialog
+                dialog.dismiss();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void openGoogleMaps(String locationName) {
+        Uri gmmIntentUri = Uri.parse("geo:0,0?q=" + Uri.encode(locationName));
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+
+        if (mapIntent.resolveActivity(requireActivity().getPackageManager()) != null) {
+            startActivity(mapIntent);
+        } else {
+            Toast.makeText(requireContext(), "Google Maps app is not installed", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
     private void closePopUpFragment() {
