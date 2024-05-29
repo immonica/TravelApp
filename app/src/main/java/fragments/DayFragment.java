@@ -4,7 +4,9 @@ import static android.content.ContentValues.TAG;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -133,6 +135,11 @@ public class DayFragment extends Fragment {
                             // Do nothing
                         });
                         builder.show();
+                    });
+
+                    // Set click listener for the CardView
+                    itineraryView.setOnClickListener(v -> {
+                        openGoogleMapsForDirections((String) place.get("address"));
                     });
 
                     dayContentLayout.addView(itineraryView);
@@ -269,6 +276,28 @@ public class DayFragment extends Fragment {
         }).addOnFailureListener((exception) -> {
             Log.e(TAG, "Place not found: " + exception.getMessage());
         });
+    }
+
+    private void openGoogleMapsForDirections(String address) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Open Google Maps")
+                .setMessage("Are you sure you want to open Google Maps to see directions to this location?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // If the user confirms, open Google Maps
+                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(address));
+                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                    mapIntent.setPackage("com.google.android.apps.maps");
+                    if (mapIntent.resolveActivity(requireContext().getPackageManager()) != null) {
+                        startActivity(mapIntent);
+                    } else {
+                        Toast.makeText(getContext(), "Google Maps is not installed.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // If the user cancels, just dismiss the dialog
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     @Override
