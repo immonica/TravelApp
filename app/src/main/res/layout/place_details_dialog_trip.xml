@@ -1,82 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- res/layout/dialog_place_details.xml -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@color/grey"
-    android:padding="16dp">
+    android:layout_height="wrap_content">
 
-    <!-- Image View for Photo -->
-    <ImageView
-        android:id="@+id/place_photo_image_view_trip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scaleType="centerCrop"
-        android:adjustViewBounds="true"
-        android:src="@drawable/placeholder_image" />
-
-    <!-- Text Views for Details -->
-    <TextView
-        android:id="@+id/place_name_text_view_trip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Name"
-        android:textColor="@color/blue"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/place_address_text_view_trip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Address"
-        android:textColor="@color/blue"/>
-
-    <TextView
-        android:id="@+id/place_phone_text_view_trip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Phone"
-        android:textColor="@color/blue"/>
-
-    <TextView
-        android:id="@+id/place_website_text_view_trip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Website"
-        android:textColor="@color/blue"/>
-
-    <!-- Layout for Save Button and Directions Icon -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        android:gravity="center_horizontal">
+        android:orientation="vertical"
+        android:background="@color/grey"
+        android:padding="16dp">
 
-        <!-- Button to Save to Itinerary -->
-        <Button
-            android:id="@+id/save_to_itinerary_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Save to Itinerary"
-            android:textColor="@color/blue"
-            android:textStyle="bold"
-            android:background="@drawable/ripple_effect"/>
-
-        <!-- Icon for Directions -->
+        <!-- Image View for Photo -->
         <ImageView
-            android:id="@+id/directions_icon_trip"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:src="@drawable/baseline_directions_24" />
-    </LinearLayout>
+            android:id="@+id/place_photo_image_view_trip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:src="@drawable/placeholder_image" />
 
-</LinearLayout>
+        <!-- Text Views for Details -->
+        <TextView
+            android:id="@+id/place_name_text_view_trip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Name"
+            android:textColor="@color/blue"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/place_address_text_view_trip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Address"
+            android:textColor="@color/blue"/>
+
+        <TextView
+            android:id="@+id/place_phone_text_view_trip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Phone"
+            android:textColor="@color/blue"/>
+
+        <TextView
+            android:id="@+id/place_website_text_view_trip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Website"
+            android:textColor="@color/blue"/>
+
+        <!-- Layout for Save Button and Directions Icon -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_horizontal">
+
+            <!-- Button to Save to Itinerary -->
+            <Button
+                android:id="@+id/save_to_itinerary_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Save to Itinerary"
+                android:textColor="@color/blue"
+                android:textStyle="bold"
+                android:background="@drawable/ripple_effect"/>
+
+            <!-- Icon for Directions -->
+            <ImageView
+                android:id="@+id/directions_icon_trip"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/baseline_directions_24" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

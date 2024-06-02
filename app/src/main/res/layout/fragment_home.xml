@@ -14,62 +14,71 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Navigation Bar -->
-    <LinearLayout
+    <!-- Grey Navigation Bar -->
+    <View
         android:id="@+id/navigation_bar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="60dp"
+        android:background="@color/grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent" />
 
-        <!-- Navigation Bar Image -->
-        <ImageView
-            android:id="@+id/nav_bar_image"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@color/grey"
-            android:scaleType="fitXY" />
-
-    </LinearLayout>
-
-    <!-- Search Button -->
-    <ImageView
-        android:id="@+id/search_button"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_marginBottom="-35dp"
-        android:background="@drawable/ripple_effect"
-        android:onClick="onSearchButtonClick"
-        android:src="@drawable/search_button"
-        app:layout_constraintBottom_toTopOf="@id/navigation_bar"
-        app:layout_constraintStart_toStartOf="@id/navigation_bar"
-        app:layout_constraintEnd_toEndOf="@id/navigation_bar" />
-
-    <!-- Text below Search Button -->
-    <TextView
-        android:id="@+id/search_button_text"
+    <!-- Search Button with Text -->
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="+ New trip"
-        android:textSize="13sp"
-        android:textColor="@color/blue"
-        android:fontFamily="sans-serif-black"
-        app:layout_constraintTop_toBottomOf="@id/search_button"
-        app:layout_constraintStart_toStartOf="@id/search_button"
-        app:layout_constraintEnd_toEndOf="@id/search_button" />
-
-    <!-- Account Icon -->
-    <ImageView
-        android:id="@+id/account_icon"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/baseline_account_circle_24"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toTopOf="@id/navigation_bar"
-        app:layout_constraintEnd_toEndOf="@id/navigation_bar"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="5dp" />
+        app:layout_constraintBottom_toBottomOf="@id/navigation_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="20dp">
+
+        <ImageView
+            android:id="@+id/search_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/ripple_effect"
+            android:onClick="onSearchButtonClick"
+            android:src="@drawable/search_button"/>
+
+        <TextView
+            android:id="@+id/search_button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+ New trip"
+            android:textSize="13sp"
+            android:textColor="@color/blue"
+            android:fontFamily="sans-serif-black" />
+    </LinearLayout>
+
+    <!-- Account Icon with Text -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toTopOf="@id/navigation_bar"
+        app:layout_constraintBottom_toBottomOf="@id/navigation_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="20dp">
+
+        <ImageView
+            android:id="@+id/account_icon"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:src="@drawable/baseline_account_circle_24" />
+
+        <TextView
+            android:id="@+id/account_button_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Account"
+            android:textSize="13sp"
+            android:textColor="@color/blue"
+            android:fontFamily="sans-serif-black" />
+    </LinearLayout>
 
     <!-- Autocomplete CardView -->
     <androidx.cardview.widget.CardView

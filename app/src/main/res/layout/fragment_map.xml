@@ -16,26 +16,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
-    <!-- Navigation Bar -->
-    <LinearLayout
+    <!-- Grey Navigation Bar -->
+    <View
         android:id="@+id/navigation_bar"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="60dp"
+        android:background="@color/grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <!-- Navigation Bar Image -->
-        <ImageView
-            android:id="@+id/nav_bar_image"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@color/grey"
-            android:scaleType="fitXY" />
-
-    </LinearLayout>
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Back Icon -->
     <ImageView
@@ -74,8 +63,6 @@
 
     </LinearLayout>
 
-
-
     <!-- List Icon -->
     <ImageView
         android:id="@+id/list_icon"
@@ -87,183 +74,230 @@
         android:layout_marginEnd="20dp"
         android:layout_marginTop="5dp" />
 
-
     <!-- Filter Buttons -->
     <LinearLayout
         android:id="@+id/filter_buttons_layout"
         android:layout_width="0dp"
         android:layout_height="80dp"
-        android:orientation="vertical"
+        android:layout_marginTop="0dp"
         android:background="@color/grey"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="0dp">
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- First Row of Buttons -->
+    <!-- First Row of Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="0dp"
+        android:orientation="horizontal">
+
+        <!-- Museum Button -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:orientation="horizontal"
-            android:layout_marginBottom="0dp">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
 
-            <!-- Museum Button -->
-            <Button
+            <ImageView
                 android:id="@+id/button_museum"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_museum_24"
+                android:contentDescription="Museum" />
+
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Museum"
-                android:layout_weight="1"
-                android:textSize="13sp"
                 android:textColor="@color/blue"
-                android:textStyle="bold"
-                android:background="@drawable/ripple_effect"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:shadowColor="#80000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="3"/>
-
-            <!-- Hotel Button -->
-            <Button
-                android:id="@+id/button_hotel"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Hotel"
-                android:layout_weight="1"
-                android:textSize="13sp"
-                android:textColor="@color/blue"
-                android:textStyle="bold"
-                android:background="@drawable/ripple_effect"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:shadowColor="#80000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="3"/>
-
-            <!-- Shop Button -->
-            <Button
-                android:id="@+id/button_gift_shop"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Shop"
-                android:layout_weight="1"
-                android:textSize="13sp"
-                android:textColor="@color/blue"
-                android:textStyle="bold"
-                android:background="@drawable/ripple_effect"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:shadowColor="#80000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="3"/>
-
-            <!-- Park Button -->
-            <Button
-                android:id="@+id/button_park"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Park"
-                android:layout_weight="1"
-                android:textSize="13sp"
-                android:textColor="@color/blue"
-                android:textStyle="bold"
-                android:background="@drawable/ripple_effect"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:shadowColor="#80000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="3"/>
-
+                android:textSize="12sp"
+                android:layout_gravity="center_horizontal"/>
         </LinearLayout>
 
-        <!-- Second Row of Buttons -->
+        <!-- Hotel Button -->
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:orientation="horizontal"
-            android:layout_marginBottom="0dp">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
 
-            <!-- Restaurant Button -->
-            <Button
-                android:id="@+id/button_restaurant"
-                android:layout_width="0dp"
+            <ImageView
+                android:id="@+id/button_hotel"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Food"
-                android:layout_weight="1"
-                android:textSize="13sp"
-                android:textColor="@color/blue"
-                android:textStyle="bold"
-                android:background="@drawable/ripple_effect"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:shadowColor="#80000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="3"/>
+                android:src="@drawable/baseline_hotel_24"
+                android:contentDescription="Hotel" />
 
-            <!-- Cafe Button -->
-            <Button
-                android:id="@+id/button_cafe"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cafe"
-                android:layout_weight="1"
-                android:textSize="13sp"
+                android:text="Hotel"
                 android:textColor="@color/blue"
-                android:textStyle="bold"
-                android:background="@drawable/ripple_effect"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:shadowColor="#80000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="3"/>
+                android:textSize="12sp"
+                android:layout_gravity="center_horizontal"/>
+        </LinearLayout>
 
-            <!-- Bar Button -->
-            <Button
-                android:id="@+id/button_bar"
-                android:layout_width="0dp"
+        <!-- Shop Button -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/button_gift_shop"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bar"
-                android:layout_weight="1"
-                android:textSize="13sp"
-                android:textColor="@color/blue"
-                android:textStyle="bold"
-                android:background="@drawable/ripple_effect"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:shadowColor="#80000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="3"/>
+                android:src="@drawable/baseline_shopping_cart_24"
+                android:contentDescription="Shop" />
 
-            <!-- Favorite Button -->
-            <Button
-                android:id="@+id/button_favorite"
-                android:layout_width="0dp"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Favorite"
-                android:layout_weight="1"
-                android:textSize="13sp"
+                android:text="Shop"
                 android:textColor="@color/blue"
-                android:textStyle="bold"
-                android:background="@drawable/ripple_effect"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:shadowColor="#80000000"
-                android:shadowDx="2"
-                android:shadowDy="2"
-                android:shadowRadius="3"/>
+                android:textSize="12sp"
+                android:layout_gravity="center_horizontal"/>
+        </LinearLayout>
 
+        <!-- Park Button -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
 
+            <ImageView
+                android:id="@+id/button_park"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_park_24"
+                android:contentDescription="Park" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Park"
+                android:textColor="@color/blue"
+                android:textSize="12sp"
+                android:layout_gravity="center_horizontal"/>
         </LinearLayout>
 
     </LinearLayout>
+
+    <!-- Second Row of Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginBottom="0dp"
+        android:orientation="horizontal">
+
+    <!-- Restaurant Button -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/button_restaurant"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_restaurant_24"
+            android:contentDescription="Restaurant" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Restaurant"
+            android:textColor="@color/blue"
+            android:textSize="12sp"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+
+    <!-- Cafe Button -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <ImageView
+            android:id="@+id/button_cafe"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/baseline_local_cafe_24"
+            android:contentDescription="Cafe" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cafe"
+            android:textColor="@color/blue"
+            android:textSize="12sp"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+
+        <!-- Bar Button -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/button_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/baseline_wine_bar_24"
+                android:contentDescription="Bar" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bar"
+                android:textColor="@color/blue"
+                android:textSize="12sp"
+                android:layout_gravity="center_horizontal"/>
+        </LinearLayout>
+
+        <!-- Favorite Button -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/button_favorite"
+                android:layout_width="30dp"
+                android:layout_height="20dp"
+                android:contentDescription="Favorite"
+                android:src="@drawable/ic_favorite_checked" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Favorite"
+                android:textColor="@color/blue"
+                android:textSize="12sp"
+                android:layout_gravity="center_horizontal"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    </LinearLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

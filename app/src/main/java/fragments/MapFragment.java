@@ -137,15 +137,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        // Initialize buttons
-        Button buttonMuseum = view.findViewById(R.id.button_museum);
-        Button buttonPark = view.findViewById(R.id.button_park);
-        Button buttonRestaurant = view.findViewById(R.id.button_restaurant);
-        Button buttonCafe = view.findViewById(R.id.button_cafe);
-        Button buttonHotel = view.findViewById(R.id.button_hotel);
-        Button buttonGiftShop = view.findViewById(R.id.button_gift_shop);
-        Button buttonBar = view.findViewById(R.id.button_bar);
-        Button buttonFavorite = view.findViewById(R.id.button_favorite);
+        // Initialize ImageViews for buttons
+        ImageView buttonMuseum = view.findViewById(R.id.button_museum);
+        ImageView buttonPark = view.findViewById(R.id.button_park);
+        ImageView buttonRestaurant = view.findViewById(R.id.button_restaurant);
+        ImageView buttonCafe = view.findViewById(R.id.button_cafe);
+        ImageView buttonHotel = view.findViewById(R.id.button_hotel);
+        ImageView buttonGiftShop = view.findViewById(R.id.button_gift_shop);
+        ImageView buttonBar = view.findViewById(R.id.button_bar);
+        ImageView buttonFavorite = view.findViewById(R.id.button_favorite);
 
         // Set OnClickListener for museum button
         buttonMuseum.setOnClickListener(new View.OnClickListener() {
@@ -210,10 +210,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        // Set OnClickListener for favorite button
         buttonFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle bar markers
+                // Toggle favorite markers
                 toggleMarkers("favorite");
             }
         });
@@ -229,6 +230,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         return view;
     }
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
