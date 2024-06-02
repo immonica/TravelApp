@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.Address;
@@ -498,12 +499,42 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         });
 
+        // Set up the Directions icon
+        ImageView directionsIcon = dialogView.findViewById(R.id.directions_icon);
+        directionsIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGoogleMapsForDirections(address);
+            }
+        });
 
         // Show the custom dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setView(dialogView)
                 .setTitle("Place Details")
                 .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private void openGoogleMapsForDirections(String address) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Open Google Maps")
+                .setMessage("Are you sure you want to open Google Maps to see directions to this location?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // If the user confirms, open Google Maps
+                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(address));
+                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                    mapIntent.setPackage("com.google.android.apps.maps");
+                    if (mapIntent.resolveActivity(requireContext().getPackageManager()) != null) {
+                        startActivity(mapIntent);
+                    } else {
+                        Toast.makeText(getContext(), "Google Maps is not installed.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // If the user cancels, just dismiss the dialog
+                    dialog.dismiss();
+                })
                 .show();
     }
 

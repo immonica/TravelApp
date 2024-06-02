@@ -4,6 +4,7 @@ import static android.content.ContentValues.TAG;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Address;
 import android.location.Geocoder;
@@ -722,6 +723,38 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Handle the Save to Itinerary button click
         Button saveToItineraryButton = dialogView.findViewById(R.id.save_to_itinerary_button);
         saveToItineraryButton.setOnClickListener(v -> showDatePickerDialog(place.getId(), name, address, trip.getKey()));
+
+        // Set up the Directions icon
+        ImageView directionsIcon = dialogView.findViewById(R.id.directions_icon_trip);
+        directionsIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openGoogleMapsForDirections(address);
+            }
+        });
+
+    }
+
+    private void openGoogleMapsForDirections(String address) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Open Google Maps")
+                .setMessage("Are you sure you want to open Google Maps to see directions to this location?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // If the user confirms, open Google Maps
+                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(address));
+                    Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                    mapIntent.setPackage("com.google.android.apps.maps");
+                    if (mapIntent.resolveActivity(requireContext().getPackageManager()) != null) {
+                        startActivity(mapIntent);
+                    } else {
+                        Toast.makeText(getContext(), "Google Maps is not installed.", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // If the user cancels, just dismiss the dialog
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     private void fetchPlacePhoto(Place place, View dialogView) {
