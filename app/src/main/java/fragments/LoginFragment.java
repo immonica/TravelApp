@@ -61,7 +61,6 @@ public class LoginFragment extends Fragment {
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
-        // Check if email or password is empty
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(getContext(), "Please enter both email and password.", Toast.LENGTH_SHORT).show();
             return;
@@ -74,7 +73,6 @@ public class LoginFragment extends Fragment {
                         navigateToHomeFragment();
                         Toast.makeText(getContext(), "Login Successful!", Toast.LENGTH_SHORT).show();
                     } else {
-                        // If sign in fails, display a message to the user.
                         Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
                         Log.e(TAG, "signInWithEmail:failure", task.getException());
                     }

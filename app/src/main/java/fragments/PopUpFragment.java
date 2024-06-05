@@ -64,7 +64,7 @@ public class PopUpFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_popup, container, false);
 
-        // Button Click Listener
+        // Button close
         rootView.findViewById(R.id.delete_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,10 +72,8 @@ public class PopUpFragment extends Fragment {
             }
         });
 
-        // Find the logout_button
+        // logout_button
         Button logoutButton = rootView.findViewById(R.id.logout_button);
-
-        // Set OnClickListener for the logout_button
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -101,7 +99,6 @@ public class PopUpFragment extends Fragment {
 
         Places.initialize(requireContext(), getString(R.string.my_map_api_key));
         placesClient = Places.createClient(requireContext());
-
 
         return rootView;
     }
@@ -136,7 +133,6 @@ public class PopUpFragment extends Fragment {
                     tripContainer.removeAllViews();
                     long totalTrips = dataSnapshot.getChildrenCount();
                     if (totalTrips == 0) {
-                        // If no trips, display a message
                         TextView noTripsTextView = new TextView(requireContext());
                         noTripsTextView.setText("No trips created yet");
                         noTripsTextView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
@@ -164,7 +160,6 @@ public class PopUpFragment extends Fragment {
                     Log.e(TAG, "Error fetching trips: " + databaseError.getMessage());
                 }
             };
-
             tripsRef.addValueEventListener(valueEventListener);
         }
     }
@@ -187,7 +182,6 @@ public class PopUpFragment extends Fragment {
         // Add the inflated layout to tripContainer
         tripContainer.addView(tripView);
     }
-
 
     private void fetchPlacePhoto(String cityName, ImageView imageView) {
         // Create a FindAutocompletePredictionsRequest for the city name
@@ -242,41 +236,31 @@ public class PopUpFragment extends Fragment {
             if (favoritesValueEventListener != null) {
                 favoritesRef.removeEventListener(favoritesValueEventListener);
             }
-
             favoritesValueEventListener = new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    favoriteContainer.removeAllViews(); // Clear previous views
+                    favoriteContainer.removeAllViews();
                     if (dataSnapshot.getChildrenCount() == 0) {
-                        // If no favorites, display a message
                         TextView noFavoritesTextView = new TextView(requireContext());
                         noFavoritesTextView.setText("No favorite locations");
                         noFavoritesTextView.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.black));
                         noFavoritesTextView.setTextSize(18);
                         noFavoritesTextView.setPadding(16, 16, 16, 16);
-
                         favoriteContainer.addView(noFavoritesTextView);
                     } else {
-                        // If favorites exist, populate the ScrollView
                         for (DataSnapshot favoriteSnapshot : dataSnapshot.getChildren()) {
                             Favorite favorite = favoriteSnapshot.getValue(Favorite.class);
-                            if (favorite != null) {
-                                addFavoriteView(favorite);
-                            }
-                        }
+                            if (favorite != null) { addFavoriteView(favorite); } }
                     }
                 }
-
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
                     Log.e(TAG, "Error fetching favorites: " + databaseError.getMessage());
                 }
             };
-
             favoritesRef.addValueEventListener(favoritesValueEventListener);
         }
     }
-
 
     private void addFavoriteView(Favorite favorite) {
         LayoutInflater inflater = LayoutInflater.from(requireContext());
@@ -284,7 +268,7 @@ public class PopUpFragment extends Fragment {
 
         TextView nameTextView = favoriteView.findViewById(R.id.favorite_text_view);
         ImageView imageView = favoriteView.findViewById(R.id.place_favorite_image_view);
-        Button removeButton = favoriteView.findViewById(R.id.remove_favorite_button); // Add this line
+        Button removeButton = favoriteView.findViewById(R.id.remove_favorite_button);
 
         nameTextView.setText(favorite.getName());
 
@@ -293,11 +277,9 @@ public class PopUpFragment extends Fragment {
         removeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Remove the favorite from Firebase
                 removeFavoriteFromFirebase(favorite);
             }
         });
-
         favoriteView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -315,13 +297,11 @@ public class PopUpFragment extends Fragment {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // User clicked Yes, proceed with removing the favorite
                 if (favoritesRef != null) {
                     favoritesRef.child(favorite.getKey()).removeValue()
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
                                 public void onSuccess(Void aVoid) {
-                                    // Favorite removed successfully, update UI
                                     Toast.makeText(requireContext(), "Favorite removed", Toast.LENGTH_SHORT).show();
                                 }
                             })
@@ -332,13 +312,10 @@ public class PopUpFragment extends Fragment {
                                     Toast.makeText(requireContext(), "Failed to remove favorite", Toast.LENGTH_SHORT).show();
                                 }
                             });
-                }
-            }
-        });
+                } } });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // User clicked No, dismiss the dialog
                 dialog.dismiss();
             }
         });
@@ -379,7 +356,6 @@ public class PopUpFragment extends Fragment {
             Toast.makeText(requireContext(), "Google Maps app is not installed", Toast.LENGTH_SHORT).show();
         }
     }
-
 
     private void closePopUpFragment() {
         // Go back to the previous fragment (HomeFragment)

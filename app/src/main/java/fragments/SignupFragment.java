@@ -72,13 +72,11 @@ public class SignupFragment extends Fragment {
                         navigateToHomeFragment();
                         Toast.makeText(getContext(), "Sign Up Successful!", Toast.LENGTH_SHORT).show();
                     } else {
-                        // If sign up fails, display a message to the user.
                         Toast.makeText(getContext(), "Sign Up failed. Please try again.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    // Method to navigate to HomeFragment
     private void navigateToHomeFragment() {
         // Create an instance of HomeFragment and replace the current fragment with it
         HomeFragment homeFragment = new HomeFragment();
@@ -88,7 +86,6 @@ public class SignupFragment extends Fragment {
         transaction.commit();
     }
 
-    // Method to navigate back to LoginFragment
     private void navigateToLoginFragment() {
         // Create an instance of LoginFragment and replace the current fragment with it
         LoginFragment loginFragment = new LoginFragment();

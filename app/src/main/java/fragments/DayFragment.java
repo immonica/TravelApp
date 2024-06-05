@@ -155,11 +155,10 @@ public class DayFragment extends Fragment {
             boolean visited = (Boolean) place.get("visited");
             Log.d(TAG, "Updating visited status for place in trip: " + tripKey + ", Day: " + day + ", Visited: " + visited);
 
-            // Construct the reference path using uid, tripKey (key), day, and placeId
             DatabaseReference placeRef = tripRef.child(tripKey)
                     .child("itinerary")
                     .child(day)
-                    .child((String) place.get("key")) // Assuming place key is stored in the map
+                    .child((String) place.get("key"))
                     .child("visited");
             placeRef.setValue(visited)
                     .addOnSuccessListener(aVoid -> {
@@ -179,7 +178,6 @@ public class DayFragment extends Fragment {
             placeViews.add(dayContentLayout.getChildAt(i));
         }
 
-        // Sort the views based on visited state
         Collections.sort(placeViews, new Comparator<View>() {
             @Override
             public int compare(View view1, View view2) {
@@ -187,7 +185,6 @@ public class DayFragment extends Fragment {
                 CheckBox visitCheckBox2 = view2.findViewById(R.id.visit_checkbox);
                 boolean visited1 = visitCheckBox1.isChecked();
                 boolean visited2 = visitCheckBox2.isChecked();
-                // Places with visited state false come first
                 if (!visited1 && visited2) {
                     return -1;
                 } else if (visited1 && !visited2) {
@@ -197,11 +194,7 @@ public class DayFragment extends Fragment {
                 }
             }
         });
-
-        // Remove all views from the layout
         dayContentLayout.removeAllViews();
-
-        // Add views back to the layout in the sorted order
         for (View view : placeViews) {
             dayContentLayout.addView(view);
         }
@@ -283,7 +276,6 @@ public class DayFragment extends Fragment {
                 .setTitle("Open Google Maps")
                 .setMessage("Are you sure you want to open Google Maps to see directions to this location?")
                 .setPositiveButton("Yes", (dialog, which) -> {
-                    // If the user confirms, open Google Maps
                     Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(address));
                     Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     mapIntent.setPackage("com.google.android.apps.maps");
@@ -294,7 +286,6 @@ public class DayFragment extends Fragment {
                     }
                 })
                 .setNegativeButton("No", (dialog, which) -> {
-                    // If the user cancels, just dismiss the dialog
                     dialog.dismiss();
                 })
                 .show();

@@ -94,7 +94,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             initializeMap();
         }
     }
-
     private void initializeMap() {
         Toast.makeText(getContext(), "Map is Ready", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "initializeMap: map is ready");
@@ -143,8 +142,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         super.onCreate(savedInstanceState);
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        //mSearchText = view.findViewById(R.id.InputText);
-
         getLocationPermission();
 
         Places.initialize(getActivity(), getString(R.string.my_map_api_key));
@@ -154,20 +151,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                // Handle the selected place
-                //String add = place.getAddress();
-                //String id = place.getId();
                 LatLng latLng = place.getLatLng();
                 moveCamera(latLng, DEFAULT_ZOOM, place.getAddress(), place.getId());
-
-                // Extract the name of the selected place
                 String placeName = place.getName();
-                // Perform reverse geocoding to get the city
                 Geocoder geocoder = new Geocoder(requireContext(), Locale.getDefault());
                 try {
                     List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
                     if (!addresses.isEmpty()) {
-                        city = addresses.get(0).getLocality(); // Assign value to city variable
+                        city = addresses.get(0).getLocality();
                     } else {
                         Log.e(TAG, "No address found for the location");
                         Toast.makeText(getContext(), "No address found for the location", Toast.LENGTH_SHORT).show();
@@ -176,14 +167,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     Log.e(TAG, "Geocoding failed: " + e.getMessage());
                     Toast.makeText(getContext(), "Geocoding failed", Toast.LENGTH_SHORT).show();
                 }
-
-                // Perform a text search using the name of the selected place
                 performTextSearch(placeName);
             }
-
             @Override
             public void onError(Status status) {
-                // Handle any errors
                 Toast.makeText(getContext(), "Some Error is Search", Toast.LENGTH_SHORT).show();
             }
         });
@@ -201,22 +188,18 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                                 || keyEvent.getAction() == KeyEvent.ACTION_DOWN
                                 || keyEvent.getAction() == KeyEvent.KEYCODE_ENTER) {
 
-                            // Execute your method for searching
                             geoLocate();
-
-                            return true; // Consume the event
+                            return true;
                         }
-
-                        return false; // Don't consume the event
+                        return false;
                     }
                 });
             }
         }
 
-
         placesClient = Places.createClient(requireContext());
 
-        // Add click listener for the search button
+        // Search Button
         view.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -225,10 +208,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         });
 
-        // Find the account_icon ImageView
+        // Account icon
         ImageView accountIcon = view.findViewById(R.id.account_icon);
-
-        // Set OnClickListener for account_icon
         accountIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -237,7 +218,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 PopUpFragment popUpFragment = new PopUpFragment();
                 fragmentTransaction.replace(R.id.fragmentContainer, popUpFragment);
-                fragmentTransaction.addToBackStack(null); // Optional: Add to back stack
+                fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
             }
         });
@@ -246,46 +227,37 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     }
 
     private void openPopupDialog() {
-        // Inflate the custom dialog layout for search
         View searchDialogView = getLayoutInflater().inflate(R.layout.popup_layout, null);
-        // Find the EditText for city name
+
         EditText cityEditText = searchDialogView.findViewById(R.id.cityEditText);
         EditText startDateEditText = searchDialogView.findViewById(R.id.startDateEditText);
         EditText endDateEditText = searchDialogView.findViewById(R.id.endDateEditText);
 
-        // Set up the dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setView(searchDialogView)
                 .setTitle("Search for a trip")
-                .setNegativeButton("Cancel", null) // Only Cancel button
+                .setNegativeButton("Cancel", null)
                 .setPositiveButton("Create Trip", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Validate input fields
                         String city = cityEditText.getText().toString().trim();
                         String startDateString = startDateEditText.getText().toString().trim();
                         String endDateString = endDateEditText.getText().toString().trim();
-
                         if (!city.isEmpty() && !startDateString.isEmpty() && !endDateString.isEmpty()) {
-                            // Save data to Firebase (replace this with your Firebase saving logic)
                             saveTripToFirebase(city, startDateString, endDateString);
-                            // Dismiss the dialog
                             dialog.dismiss();
                         } else {
-                            // Display a message indicating missing fields
                             Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
 
-        // Set up click listeners for date EditText fields
         startDateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showDatePickerDialog(startDateEditText, endDateEditText);
             }
         });
-
         endDateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -298,18 +270,15 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     }
 
     private void showDatePickerDialog(final EditText dateEditText, final EditText startDateEditText) {
-        // Get current date
         final Calendar c = Calendar.getInstance();
         int year = c.get(Calendar.YEAR);
         int month = c.get(Calendar.MONTH);
         int day = c.get(Calendar.DAY_OF_MONTH);
 
-        // Create a new DatePickerDialog instance with minimum date set to the day after the start date
         DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(),
                 new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        // Display the selected date in the EditText
                         String selectedDate = dayOfMonth + "/" + (monthOfYear + 1) + "/" + year;
                         dateEditText.setText(selectedDate);
                     }
@@ -317,7 +286,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
         // Set the minimum date to the day after the start date
         if (startDateEditText.getText().toString().isEmpty()) {
-            // If start date is not set, set minimum date to today
             datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis() - 1000);
         } else {
             // If start date is set, set minimum date to the day after the start date
@@ -326,23 +294,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             startDateCalendar.set(Integer.parseInt(startDateParts[2]), Integer.parseInt(startDateParts[1]) - 1, Integer.parseInt(startDateParts[0]));
             datePickerDialog.getDatePicker().setMinDate(startDateCalendar.getTimeInMillis() + (24 * 60 * 60 * 1000));
         }
-
-        // Show the DatePickerDialog
         datePickerDialog.show();
     }
 
-
     private void saveTripToFirebase(String city, String startDate, String endDate) {
-        // Get the current user's UID
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get the current user's UID
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference(); // Get a reference to the root node of the database
+        DatabaseReference tripRef = databaseRef.child("users").child(uid).child("trips").push(); // Push generates a unique ID for the trip; Create a new node for the trip under the user's UID
 
-        // Get a reference to the root node of the database
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
-
-        // Create a new node for the trip under the user's UID
-        DatabaseReference tripRef = databaseRef.child("users").child(uid).child("trips").push(); // Push generates a unique ID for the trip
-
-        // Create a map to hold trip data
         Map<String, Object> tripData = new HashMap<>();
         tripData.put("city", city);
         tripData.put("startDate", startDate);
@@ -353,10 +312,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         try {
             Date startDateObj = sdf.parse(startDate);
             Date endDateObj = sdf.parse(endDate);
-
             Calendar startCalendar = Calendar.getInstance();
             startCalendar.setTime(startDateObj);
-
             Calendar endCalendar = Calendar.getInstance();
             endCalendar.setTime(endDateObj);
 
@@ -368,17 +325,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 startCalendar.add(Calendar.DATE, 1);
             }
 
-            // Add days to trip data
-            tripData.put("days", daysList);
-
-            // Set the data to the database
-            tripRef.setValue(tripData)
+            tripData.put("days", daysList); // Add days to trip data
+            tripRef.setValue(tripData) // Set the data to the database
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             Log.d(TAG, "Trip data saved successfully!");
-                            // Optionally, you can show a success message or perform other actions here
-                            // Navigate to MapFragment
                             Fragment mapFragment = new MapFragment();
                             getParentFragmentManager().beginTransaction()
                                     .replace(R.id.fragmentContainer, mapFragment)
@@ -390,14 +342,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                         @Override
                         public void onFailure(@NonNull Exception e) {
                             Log.e(TAG, "Error saving trip data: " + e.getMessage());
-                            // Optionally, you can show an error message or perform other actions here
                         }
                     });
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
-
 
     private void geoLocate(){
         Log.d(TAG, "geoLocate: geolocating");
@@ -424,19 +374,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     }
 
     private void fetchPlaceDetails(String placeId) {
-        // Define fields you want to retrieve
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.LAT_LNG);
-
-        // Construct a FetchPlaceRequest
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME,
+                Place.Field.ADDRESS, Place.Field.PHONE_NUMBER, Place.Field.WEBSITE_URI, Place.Field.LAT_LNG);
         FetchPlaceRequest request = FetchPlaceRequest.newInstance(placeId, placeFields);
 
-        // Fetch place details asynchronously
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place place = response.getPlace();
-            // Handle fetched place details
             displayPlaceDetails(place);
         }).addOnFailureListener((exception) -> {
-            // Handle fetch failure
             Log.e(TAG, "Place not found: " + exception.getMessage());
         });
     }
@@ -539,52 +484,38 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     }
 
     private void fetchPlacePhoto(Place place, View dialogView) {
-        // Define the fields to be returned for the photo
         List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS);
-
-        // Construct a FetchPlaceRequest
         FetchPlaceRequest request = FetchPlaceRequest.newInstance(place.getId(), fields);
 
-        // Fetch place details asynchronously
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place fetchedPlace = response.getPlace();
-            // Get the photo metadata
             List<PhotoMetadata> photoMetadataList = fetchedPlace.getPhotoMetadatas();
             if (photoMetadataList != null && !photoMetadataList.isEmpty()) {
-                // Get the first photo metadata
                 PhotoMetadata photoMetadata = photoMetadataList.get(0);
 
-                // Create a FetchPhotoRequest
                 FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                        .setMaxHeight(1600) // Set maximum height of the photo
-                        .setMaxWidth(1600) // Set maximum width of the photo
+                        .setMaxHeight(1600)
+                        .setMaxWidth(1600)
                         .build();
 
-                // Fetch the photo asynchronously
                 placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
                     Bitmap bitmap = fetchPhotoResponse.getBitmap();
-                    // Display the photo in your ImageView
                     if (bitmap != null) {
-                        // Set the fetched photo bitmap to the ImageView in the dialog layout
                         ImageView imageView = dialogView.findViewById(R.id.place_photo_image_view);
                         if (imageView != null) {
                             imageView.setImageBitmap(bitmap);
-                            imageView.setVisibility(View.VISIBLE); // Set visibility to VISIBLE
+                            imageView.setVisibility(View.VISIBLE);
                         }
                     }
                 }).addOnFailureListener((exception) -> {
-                    // Handle photo fetch failure
                     Log.e(TAG, "Place photo not found: " + exception.getMessage());
                 });
             }
         }).addOnFailureListener((exception) -> {
-            // Handle fetch failure
             Log.e(TAG, "Place not found: " + exception.getMessage());
         });
     }
 
-
-    // Check if the place is already in favorites and set the toggle button state
     private void checkIfFavorite(String placeId, ToggleButton toggleFavoriteButton) {
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference favRef = FirebaseDatabase.getInstance().getReference()
@@ -609,7 +540,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
     }
 
-    // Save the place to favorites in Firebase
     private void saveToFavorites(Place place, String city, String placeId) {
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference favRef = FirebaseDatabase.getInstance().getReference()
@@ -643,8 +573,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 });
     }
 
-
-    // Remove the place from favorites in Firebase
     private void removeFromFavorites(String placeId) {
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference favRef = FirebaseDatabase.getInstance().getReference()
@@ -668,46 +596,35 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
 
     }
 
-
     private void performTextSearch(String query) {
-        // Create a new PlacesClient instance
         PlacesClient placesClient = Places.createClient(requireContext());
-
-        // Define the fields to be returned for each place
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.LAT_LNG);
 
-        // Create a FindAutocompletePredictionsRequest
         FindAutocompletePredictionsRequest request = FindAutocompletePredictionsRequest.builder()
                 .setQuery(query)
                 .build();
 
-        // Perform the text search asynchronously
         placesClient.findAutocompletePredictions(request).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 FindAutocompletePredictionsResponse response = task.getResult();
                 if (response != null) {
-                    // Process the search results
                     List<AutocompletePrediction> predictions = response.getAutocompletePredictions();
                     for (AutocompletePrediction prediction : predictions) {
                         Log.i(TAG, "Place: " + prediction.getPlaceId() + ", " + prediction.getFullText(null));
-                        // Add your logic to display search results
                     }
                 }
             } else {
                 Log.e(TAG, "Text search failed: " + task.getException().getMessage());
-                // Handle the error
             }
         });
     }
 
     private void getDeviceLocation(){
         Log.d(TAG, "getDeviceLocation: getting the devices current location");
-
         mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         try{
             if(mLocationPermissionsGranted){
-
                 final Task location = mFusedLocationProviderClient.getLastLocation();
                 location.addOnCompleteListener(new OnCompleteListener() {
                     @Override
@@ -715,7 +632,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                         if(task.isSuccessful()){
                             Log.d(TAG, "onComplete: found location!");
                             Location currentLocation = (Location) task.getResult();
-
                             moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
                                     DEFAULT_ZOOM,
                                     "My Location", "");
@@ -742,7 +658,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             Marker marker = mMap.addMarker(options);
             marker.setTag(placeId); // Set the tag of the marker to the place ID
         }
-
         hideSoftKeyboard();
     }
 

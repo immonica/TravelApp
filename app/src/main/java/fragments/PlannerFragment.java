@@ -136,7 +136,8 @@ public class PlannerFragment extends Fragment {
         }
     }
 
-    private void setUpViewPagerAndTabLayout(String city, String startDate, String endDate, List<String> days, Map<String, List<Map<String, Object>>> itineraryMap, String tripKey) {
+    private void setUpViewPagerAndTabLayout(String city, String startDate, String endDate, List<String> days,
+                                            Map<String, List<Map<String, Object>>> itineraryMap, String tripKey) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(requireActivity(), days, itineraryMap, tripKey);
         viewPager.setAdapter(adapter);
 
@@ -154,15 +155,15 @@ public class PlannerFragment extends Fragment {
     private static class ViewPagerAdapter extends FragmentStateAdapter {
         private List<String> days;
         private Map<String, List<Map<String, Object>>> itineraryMap;
-        private String tripKey; // Add this line
+        private String tripKey;
 
-        public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, List<String> days, Map<String, List<Map<String, Object>>> itineraryMap, String tripKey) {
+        public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, List<String> days,
+                                Map<String, List<Map<String, Object>>> itineraryMap, String tripKey) {
             super(fragmentActivity);
             this.days = days;
             this.itineraryMap = itineraryMap;
-            this.tripKey = tripKey; // Add this line
+            this.tripKey = tripKey;
         }
-
         @NonNull
         @Override
         public Fragment createFragment(int position) {
@@ -170,9 +171,8 @@ public class PlannerFragment extends Fragment {
             String[] dateParts = day.split("/");
             String formattedDate = dateParts[2] + "/" + dateParts[1] + "/" + dateParts[0];
             List<Map<String, Object>> itinerary = itineraryMap.get(formattedDate);
-            return DayFragment.newInstance(day, itinerary != null ? itinerary : new ArrayList<>(), tripKey); // Add tripKey here
+            return DayFragment.newInstance(day, itinerary != null ? itinerary : new ArrayList<>(), tripKey);
         }
-
         @Override
         public int getItemCount() {
             return days.size();
