@@ -45,21 +45,19 @@ public class PlannerFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_planner, container, false);
 
-        // Initialize the delete button and set its click listener
+        // delete button
         ImageButton deleteButton = view.findViewById(R.id.delete_button);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle the delete button click
                 onDeleteButtonClick();
             }
         });
 
-        // Initialize ViewPager2 and TabLayout
+        //ViewPager2 and TabLayout
         viewPager = view.findViewById(R.id.view_pager);
         tabLayout = view.findViewById(R.id.tab_layout);
 
-        // Retrieve trip data from Firebase
         retrieveTripData();
 
         return view;
@@ -80,7 +78,7 @@ public class PlannerFragment extends Fragment {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
                         DataSnapshot lastTripSnapshot = snapshot.getChildren().iterator().next();
-                        String tripKey = lastTripSnapshot.getKey(); // Get the tripKey here
+                        String tripKey = lastTripSnapshot.getKey();
                         String city = lastTripSnapshot.child("city").getValue(String.class);
                         String startDate = lastTripSnapshot.child("startDate").getValue(String.class);
                         String endDate = lastTripSnapshot.child("endDate").getValue(String.class);
@@ -145,7 +143,6 @@ public class PlannerFragment extends Fragment {
     }
 
     private void onDeleteButtonClick() {
-        // Navigate back to the previous fragment in the back stack
         if (getFragmentManager() != null) {
             getFragmentManager().popBackStack();
         }

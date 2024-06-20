@@ -78,7 +78,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private int barsFetchedCount = 0;
     private boolean suggestionsFetched = false;
 
-    // Maintain lists of markers for each place type
+    //lists of markers for each place type
     private List<Marker> museumMarkers = new ArrayList<>();
     private List<Marker> parkMarkers = new ArrayList<>();
     private List<Marker> restaurantMarkers = new ArrayList<>();
@@ -110,7 +110,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         backIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Replace the current fragment with HomeFragment
                 FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 HomeFragment homeFragment = new HomeFragment();
@@ -125,7 +124,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         listIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Replace the current fragment with PlannerFragment
                 FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 PlannerFragment plannerFragment = new PlannerFragment();
@@ -148,56 +146,48 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         buttonMuseum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle museum markers
                 toggleMarkers("museum");
             }
         });
         buttonPark.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle park markers
                 toggleMarkers("park");
             }
         });
         buttonRestaurant.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle restaurant markers
                 toggleMarkers("restaurant");
             }
         });
         buttonCafe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle cafe markers
                 toggleMarkers("cafe");
             }
         });
         buttonHotel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle hotel markers
                 toggleMarkers("hotel");
             }
         });
         buttonGiftShop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle gift shop markers
                 toggleMarkers("gift_shop");
             }
         });
         buttonBar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle bar markers
                 toggleMarkers("bar");
             }
         });
         buttonFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Toggle favorite markers
                 toggleMarkers("favorite");
             }
         });
@@ -225,7 +215,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     // Obtain placeId from marker tag
                     String placeId = tag.toString();
 
-                    // Use placeId to fetch place details
                     fetchPlaceDetails(placeId);
                 } else {
                     Log.e(TAG, "Marker tag is null");
@@ -544,7 +533,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         double latitude = Double.parseDouble(favorite.getLatLng().split(",")[0]);
         double longitude = Double.parseDouble(favorite.getLatLng().split(",")[1]);
         String placeType = favorite.getPlaceType();
-        String placeId = favorite.getPlaceId(); // Retrieve placeId from Favorite object
+        String placeId = favorite.getPlaceId();
 
         PlaceSuggestion favoritePlace = new PlaceSuggestion(placeName, favorite.getCity(), favorite.getAddress(), latitude, longitude, placeType, placeId); // Pass placeId to the constructor
         Marker favoriteMarker = displayPlaceMarker(favoritePlace);
@@ -583,10 +572,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             info.append("Website: ").append(websiteUri.toString());
         }
 
-        // Inflate the custom dialog layout
         View dialogView = getLayoutInflater().inflate(R.layout.place_details_dialog_trip, null);
 
-        // Set the place details to the TextViews in the custom dialog layout
         TextView placeNameTextView = dialogView.findViewById(R.id.place_name_text_view_trip);
         placeNameTextView.setText(name);
 
@@ -603,21 +590,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             placeWebsiteTextView.setVisibility(View.GONE);
         }
 
-        // Fetch place photo
         fetchPlacePhoto(place, dialogView);
 
-        // Show the custom dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setView(dialogView)
                 .setTitle("Place Details")
                 .setPositiveButton("OK", null)
                 .show();
 
-        // Handle the Save to Itinerary button click
         Button saveToItineraryButton = dialogView.findViewById(R.id.save_to_itinerary_button);
         saveToItineraryButton.setOnClickListener(v -> showDatePickerDialog(place.getId(), name, address, trip.getKey()));
 
-        // Set up the Directions icon
         ImageView directionsIcon = dialogView.findViewById(R.id.directions_icon_trip);
         directionsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -633,7 +616,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .setTitle("Open Google Maps")
                 .setMessage("Are you sure you want to open Google Maps to see directions to this location?")
                 .setPositiveButton("Yes", (dialog, which) -> {
-                    // If the user confirms, open Google Maps
                     Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(address));
                     Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     mapIntent.setPackage("com.google.android.apps.maps");
@@ -644,7 +626,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     }
                 })
                 .setNegativeButton("No", (dialog, which) -> {
-                    // If the user cancels, just dismiss the dialog
                     dialog.dismiss();
                 })
                 .show();
@@ -659,8 +640,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             if (photoMetadataList != null && !photoMetadataList.isEmpty()) {
                 PhotoMetadata photoMetadata = photoMetadataList.get(0);
                 FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                        .setMaxHeight(1600) // Set maximum height of the photo
-                        .setMaxWidth(1600) // Set maximum width of the photo
+                        .setMaxHeight(1600)
+                        .setMaxWidth(1600)
                         .build();
 
                 placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {

@@ -7,9 +7,8 @@ public class Favorite {
     private String city;
     private String placeType;
     private String key;
-    private String placeId; // New field for placeId
+    private String placeId;
 
-    // Default constructor required for calls to DataSnapshot.getValue(Favorite.class)
     public Favorite() {
     }
 
@@ -21,7 +20,6 @@ public class Favorite {
         this.placeType = placeType;
     }
 
-    // Getters and setters for all fields
     public String getName() {
         return name;
     }
@@ -70,7 +68,6 @@ public class Favorite {
         this.key = key;
     }
 
-    // Getter and setter for the placeId field
     public String getPlaceId() {
         return placeId;
     }

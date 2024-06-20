@@ -1,13 +1,13 @@
 package fragments;
 
 public class Trip {
-    private String key; // Add key field
+    private String key;
     private String city;
     private String startDate;
     private String endDate;
 
     public Trip() {
-        // Default constructor required for calls to DataSnapshot.getValue(Trip.class)
+
     }
 
     public Trip(String key, String city, String startDate, String endDate) {

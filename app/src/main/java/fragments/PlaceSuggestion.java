@@ -3,15 +3,13 @@ package fragments;
 public class PlaceSuggestion {
     private String name;
     private String city;
-    private String address; // Add address field
+    private String address;
     private double latitude;
     private double longitude;
     private String placeId;
     private String placeType;
 
-    // Default constructor (no-argument constructor) required by Firebase
     public PlaceSuggestion() {
-        // Default constructor required by Firebase
     }
 
     public PlaceSuggestion(String name, String city, String address, double latitude, double longitude, String placeId, String placeType) {

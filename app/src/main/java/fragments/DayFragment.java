@@ -77,7 +77,6 @@ public class DayFragment extends Fragment {
         Places.initialize(requireContext(), getString(R.string.my_map_api_key));
         placesClient = Places.createClient(requireContext());
 
-        // Initialize Firebase reference
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             tripRef = FirebaseDatabase.getInstance().getReference()
@@ -115,29 +114,22 @@ public class DayFragment extends Fragment {
                     visitCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
                         place.put("visited", isChecked);
                         updateVisitedStatus(currentUser.getUid(), tripKey, day, place);
-                        // After updating the visited status, re-sort and update the views
                         sortAndRefreshViews(dayContentLayout, layoutInflater);
                     });
-                    // Fetch and set photo for the place
                     fetchPlacePhoto(placeName, imageView);
 
-                    // Set click listener for the remove button
                     removeButton.setOnClickListener(v -> {
-                        // Display a confirmation dialog
                         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
                         builder.setTitle("Confirm");
                         builder.setMessage("Are you sure you want to remove this place from the itinerary?");
                         builder.setPositiveButton("Yes", (dialog, which) -> {
-                            // Remove the place from the itinerary list
                             removePlaceFromItinerary(dayContentLayout, itineraryView, place);
                         });
                         builder.setNegativeButton("No", (dialog, which) -> {
-                            // Do nothing
                         });
                         builder.show();
                     });
 
-                    // Set click listener for the CardView
                     itineraryView.setOnClickListener(v -> {
                         openGoogleMapsForDirections((String) place.get("address"));
                     });
@@ -201,10 +193,8 @@ public class DayFragment extends Fragment {
     }
 
     private void removePlaceFromItinerary(LinearLayout dayContentLayout, View itineraryView, Map<String, Object> place) {
-        // Remove the place view from the layout
         dayContentLayout.removeView(itineraryView);
 
-        // Remove the place from the itinerary list
         String placeKey = (String) place.get("key");
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
@@ -224,7 +214,6 @@ public class DayFragment extends Fragment {
 
 
     private void fetchPlacePhoto(String cityName, ImageView imageView) {
-        // Create a FindAutocompletePredictionsRequest for the city name
         FindAutocompletePredictionsRequest predictionsRequest = FindAutocompletePredictionsRequest.builder()
                 .setQuery(cityName)
                 .build();
@@ -242,7 +231,6 @@ public class DayFragment extends Fragment {
     }
 
     private void fetchPhotoByPlaceId(String placeId, ImageView imageView) {
-        // Define the fields to be returned for the photo
         List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS);
 
         FetchPlaceRequest placeRequest = FetchPlaceRequest.newInstance(placeId, fields);

@@ -13,10 +13,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.maps.model.LatLng;
 
-import fragments.HomeFragment;
-import fragments.PopUpFragment;
 import fragments.SplashFragment;
 import fragments.LoginFragment;
 
@@ -32,14 +29,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Check for Google Play services availability
+        // Google Play services availability
         if (isServicesOK()) {
-            // Google Play services is available, proceed with fragment transactions
-
-            // Show SplashFragment initially
             replaceFragment(new SplashFragment());
 
-            // Delay for 2 seconds and then replace SplashFragment with HomeFragment
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -47,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }, 2000);
         } else {
-            // Google Play services is not available, handle accordingly (e.g., show error message)
-            // You may choose to finish the activity or display an error message
+
             Toast.makeText(this, "Google Play services are not available", Toast.LENGTH_SHORT).show();
         }
     }
@@ -59,12 +51,10 @@ public class MainActivity extends AppCompatActivity {
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(MainActivity.this);
 
         if(available == ConnectionResult.SUCCESS){
-            //everything is fine and the user can make map requests
             Log.d(TAG, "isServicesOK: Google Play Services is working");
             return true;
         }
         else if(GoogleApiAvailability.getInstance().isUserResolvableError(available)){
-            //an error occured but we can resolve it
             Log.d(TAG, "isServicesOK: an error occured but we can fix it");
             Dialog dialog = GoogleApiAvailability.getInstance().getErrorDialog(MainActivity.this, available, ERROR_DIALOG_REQUEST);
             dialog.show();

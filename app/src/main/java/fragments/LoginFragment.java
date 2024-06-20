@@ -79,9 +79,7 @@ public class LoginFragment extends Fragment {
                 });
     }
 
-    // Method to navigate to SignUpFragment
     private void navigateToSignUpFragment() {
-        // Create an instance of SignUpFragment and replace the current fragment with it
         SignupFragment signUpFragment = new SignupFragment();
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragmentContainer, signUpFragment);
@@ -89,9 +87,7 @@ public class LoginFragment extends Fragment {
         transaction.commit();
     }
 
-    // Method to navigate to HomeFragment
     private void navigateToHomeFragment() {
-        // Create an instance of HomeFragment and replace the current fragment with it
         HomeFragment homeFragment = new HomeFragment();
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragmentContainer, homeFragment);

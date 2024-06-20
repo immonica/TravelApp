@@ -175,7 +175,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         });
 
-        // Access the search input field of the AutocompleteSupportFragment using methods provided by the fragment
+        // Access the search input field of the AutocompleteSupportFragment
         View autoCompleteView = autocompleteFragment.getView();
         if (autoCompleteView != null) {
             EditText searchInput = autoCompleteView.findViewById(com.google.android.libraries.places.R.id.places_autocomplete_search_input);
@@ -203,7 +203,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         view.findViewById(R.id.search_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Call the openPopupDialog method
                 openPopupDialog();
             }
         });
@@ -213,7 +212,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
         accountIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Replace current fragment with PopUpFragment
                 FragmentManager fragmentManager = getParentFragmentManager();
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                 PopUpFragment popUpFragment = new PopUpFragment();
@@ -298,9 +296,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     }
 
     private void saveTripToFirebase(String city, String startDate, String endDate) {
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Get the current user's UID
-        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference(); // Get a reference to the root node of the database
-        DatabaseReference tripRef = databaseRef.child("users").child(uid).child("trips").push(); // Push generates a unique ID for the trip; Create a new node for the trip under the user's UID
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference databaseRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference tripRef = databaseRef.child("users").child(uid).child("trips").push();
 
         Map<String, Object> tripData = new HashMap<>();
         tripData.put("city", city);
@@ -325,8 +323,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 startCalendar.add(Calendar.DATE, 1);
             }
 
-            tripData.put("days", daysList); // Add days to trip data
-            tripRef.setValue(tripData) // Set the data to the database
+            tripData.put("days", daysList);
+            tripRef.setValue(tripData)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
@@ -366,7 +364,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             Address address = list.get(0);
 
             Log.d(TAG, "geoLocate: found a location: " + address.toString());
-            //Toast.makeText(this, address.toString(), Toast.LENGTH_SHORT).show();
 
             moveCamera(new LatLng(address.getLatitude(), address.getLongitude()), DEFAULT_ZOOM,
                     address.getAddressLine(0), "somePlaceId");
@@ -387,14 +384,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     }
 
     private void displayPlaceDetails(Place place) {
-        // Get the place details
         String name = place.getName();
         String address = place.getAddress();
         String phoneNumber = place.getPhoneNumber();
         Uri websiteUri = place.getWebsiteUri();
         LatLng latLng = place.getLatLng();
 
-        // Construct the information string
         StringBuilder info = new StringBuilder();
         info.append("Name: ").append(name).append("\n");
         info.append("Address: ").append(address).append("\n");
@@ -404,10 +399,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             info.append("Website: ").append(websiteUri.toString());
         }
 
-        // Inflate the custom dialog layout
         View dialogView = getLayoutInflater().inflate(R.layout.place_details_dialog, null);
 
-        // Set the place details to the TextViews in the custom dialog layout
         TextView placeNameTextView = dialogView.findViewById(R.id.place_name_text_view);
         placeNameTextView.setText(name);
 
@@ -424,10 +417,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             placeWebsiteTextView.setVisibility(View.GONE);
         }
 
-        // Fetch place photo
         fetchPlacePhoto(place, dialogView);
 
-        // Handle the favorite toggle button
         ToggleButton toggleFavoriteButton = dialogView.findViewById(R.id.toggle_favorite_button);
         checkIfFavorite(place.getId(), toggleFavoriteButton);  // Check and set the initial state of the toggle button
 
@@ -435,16 +426,14 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    // Save the place to favorites
                     saveToFavorites(place, city, place.getId());
                 } else {
-                    // Remove the place from favorites
                     removeFromFavorites(place.getId());
                 }
             }
         });
 
-        // Set up the Directions icon
+        //Directions icon
         ImageView directionsIcon = dialogView.findViewById(R.id.directions_icon);
         directionsIcon.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -453,7 +442,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             }
         });
 
-        // Show the custom dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setView(dialogView)
                 .setTitle("Place Details")
@@ -466,7 +454,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                 .setTitle("Open Google Maps")
                 .setMessage("Are you sure you want to open Google Maps to see directions to this location?")
                 .setPositiveButton("Yes", (dialog, which) -> {
-                    // If the user confirms, open Google Maps
                     Uri gmmIntentUri = Uri.parse("google.navigation:q=" + Uri.encode(address));
                     Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     mapIntent.setPackage("com.google.android.apps.maps");
@@ -477,7 +464,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     }
                 })
                 .setNegativeButton("No", (dialog, which) -> {
-                    // If the user cancels, just dismiss the dialog
                     dialog.dismiss();
                 })
                 .show();
@@ -534,7 +520,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e(TAG, "Error checking favorite status: " + databaseError.getMessage());
-                // Handle the error here
             }
         });
 
@@ -543,32 +528,30 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
     private void saveToFavorites(Place place, String city, String placeId) {
         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         DatabaseReference favRef = FirebaseDatabase.getInstance().getReference()
-                .child("users").child(uid).child("favorites").push(); // Generate a unique key for the favorite
+                .child("users").child(uid).child("favorites").push();
 
-        String key = favRef.getKey(); // Get the key generated by push()
+        String key = favRef.getKey();
 
         Map<String, Object> favoriteData = new HashMap<>();
         favoriteData.put("name", place.getName());
         favoriteData.put("address", place.getAddress());
-        favoriteData.put("city", city); // Save city along with other favorite data
+        favoriteData.put("city", city);
         favoriteData.put("latLng", place.getLatLng().latitude + "," + place.getLatLng().longitude);
-        favoriteData.put("placeType", "favorite"); // Assuming "favorite" is the place type
-        favoriteData.put("key", key); // Set the key in the favorite data
-        favoriteData.put("placeId", placeId); // Include the placeId
+        favoriteData.put("placeType", "favorite");
+        favoriteData.put("key", key);
+        favoriteData.put("placeId", placeId);
 
         favRef.setValue(favoriteData)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "Place added to favorites");
-                        // Handle success (if needed)
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.e(TAG, "Error adding place to favorites: " + e.getMessage());
-                        // Handle failure here
                     }
                 });
     }
@@ -583,14 +566,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "Place removed from favorites");
-                        // Handle success (if needed)
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.e(TAG, "Error removing place from favorites: " + e.getMessage());
-                        // Handle failure here
                     }
                 });
 
@@ -656,7 +637,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     .position(latLng)
                     .title(title);
             Marker marker = mMap.addMarker(options);
-            marker.setTag(placeId); // Set the tag of the marker to the place ID
+            marker.setTag(placeId);
         }
         hideSoftKeyboard();
     }
@@ -708,7 +689,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback{
                     }
                     Log.d(TAG, "onRequestPermissionsResult: permission granted");
                     mLocationPermissionsGranted = true;
-                    //initialize our map
+
                     initMap();
                 }
             }

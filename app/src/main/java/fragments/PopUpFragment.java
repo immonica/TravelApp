@@ -50,7 +50,7 @@ public class PopUpFragment extends Fragment {
 
     private View rootView;
     private TextView emailTextView;
-    // Define variables for views and Firebase
+
     private DatabaseReference tripsRef;
     private DatabaseReference favoritesRef;
     private ValueEventListener valueEventListener;
@@ -77,19 +77,17 @@ public class PopUpFragment extends Fragment {
         logoutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Call the logout method
                 logoutUser();
             }
         });
 
         emailTextView = rootView.findViewById(R.id.email_text);
-        setEmailText(); // Set email text when the fragment is created
+        setEmailText();
 
-        // Initialize tripContainer
+        //tripContainer
         tripContainer = rootView.findViewById(R.id.trip_container);
         favoriteContainer = rootView.findViewById(R.id.favorites_container);
 
-        // Initialize Firebase reference
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             DatabaseReference userRef = FirebaseDatabase.getInstance().getReference().child("users").child(user.getUid());
@@ -165,26 +163,21 @@ public class PopUpFragment extends Fragment {
     }
 
     private void addTripView(Trip trip) {
-        // Inflate the trip_item layout
+        // trip_item layout
         LayoutInflater inflater = LayoutInflater.from(requireContext());
         View tripView = inflater.inflate(R.layout.trip_layout, tripContainer, false);
 
-        // Get the TextView and ImageView from the inflated layout
         TextView tripTextView = tripView.findViewById(R.id.trip_text_view);
         ImageView tripImageView = tripView.findViewById(R.id.place_photo_image_view);
 
-        // Set the trip information in the TextView
         tripTextView.setText(trip.getCity() + ": " + trip.getStartDate() + " - " + trip.getEndDate());
 
-        // Fetch and display the place photo in the ImageView
         fetchPlacePhoto(trip.getCity(), tripImageView);
 
-        // Add the inflated layout to tripContainer
         tripContainer.addView(tripView);
     }
 
     private void fetchPlacePhoto(String cityName, ImageView imageView) {
-        // Create a FindAutocompletePredictionsRequest for the city name
         FindAutocompletePredictionsRequest predictionsRequest = FindAutocompletePredictionsRequest.builder()
                 .setQuery(cityName)
                 .build();
@@ -202,7 +195,6 @@ public class PopUpFragment extends Fragment {
     }
 
     private void fetchPhotoByPlaceId(String placeId, ImageView imageView) {
-        // Define the fields to be returned for the photo
         List<Place.Field> fields = Arrays.asList(Place.Field.PHOTO_METADATAS);
 
         FetchPlaceRequest placeRequest = FetchPlaceRequest.newInstance(placeId, fields);
@@ -330,14 +322,12 @@ public class PopUpFragment extends Fragment {
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // User clicked Yes, proceed with opening Google Maps
                 openGoogleMaps(locationName);
             }
         });
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // User clicked No, dismiss the dialog
                 dialog.dismiss();
             }
         });
@@ -358,21 +348,17 @@ public class PopUpFragment extends Fragment {
     }
 
     private void closePopUpFragment() {
-        // Go back to the previous fragment (HomeFragment)
         requireActivity().getSupportFragmentManager().popBackStack();
     }
 
     private void logoutUser() {
-        // Build and show a confirmation dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
         builder.setTitle("Logout");
         builder.setMessage("Are you sure you want to logout?");
         builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // User clicked Yes, proceed with logout
                 FirebaseAuth.getInstance().signOut();
-                // Navigate to LoginFragment after logout
                 getParentFragmentManager().beginTransaction()
                         .replace(R.id.fragmentContainer, new LoginFragment())
                         .commit();
@@ -381,7 +367,6 @@ public class PopUpFragment extends Fragment {
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // User clicked No, dismiss the dialog
                 dialog.dismiss();
             }
         });

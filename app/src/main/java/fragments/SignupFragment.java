@@ -44,7 +44,6 @@ public class SignupFragment extends Fragment {
             }
         });
 
-        // Set onClickListener for textViewLogin to navigate back to login page
         textViewLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,7 +77,6 @@ public class SignupFragment extends Fragment {
     }
 
     private void navigateToHomeFragment() {
-        // Create an instance of HomeFragment and replace the current fragment with it
         HomeFragment homeFragment = new HomeFragment();
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragmentContainer, homeFragment);
@@ -87,7 +85,6 @@ public class SignupFragment extends Fragment {
     }
 
     private void navigateToLoginFragment() {
-        // Create an instance of LoginFragment and replace the current fragment with it
         LoginFragment loginFragment = new LoginFragment();
         FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
         transaction.replace(R.id.fragmentContainer, loginFragment);
