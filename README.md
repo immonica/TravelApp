@@ -1,5 +1,8 @@
 # Explore Mate
 
+# Repository link
+https://github.com/immonica/TravelApp.git
+
 # Utilization Instructions
 This project is a travel planning mobile application developed using Android Studio, Firebase for authentication, and a real-time database.
 
