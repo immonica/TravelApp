@@ -1,6 +1,7 @@
 *.iml
 .gradle
 .idea
+/app/src/main/res/values/strings.xml
 /local.properties
 /.idea/caches
 /.idea/libraries

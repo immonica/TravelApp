@@ -1,8 +1,0 @@
-<resources>
-    <string name="app_name">TravelApp</string>
-
-    <string name="my_map_api_key">AIzaSyBSWEUXxdxXU1sh6zkuibsITXeS5SWWiAM</string>
-
-    <string name="filter_museums">Filter museums</string>
-
-</resources>
